@@ -9,10 +9,9 @@ function createCompetition(data) {
 
     label: data.label,
 
-    month: data.month,
-    startDay: data.startDay,
-    endDay: data.endDay,
-
+	startDate: data.startDate,
+	endDate: data.endDate,
+    
     rawData: data.rawData,
 
     ...(data.location && {

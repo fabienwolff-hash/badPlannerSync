@@ -3,61 +3,88 @@ function parseTRJ(
   row,
   data,
   sheetRow,
-  currentMonth
+  currentMonth,
+  mergedInfo
 ) {
 
-  const lines = cell
-    .split('\n')
-    .map(line => line.trim())
-    .filter(Boolean);
+const lines = extractLines(cell);
 
-  if (lines.length === 1) {
-    return parseMinimalTRJ(
-      lines,
-      row,
-      currentMonth
-    );
-  }
-
-  return parseDetailedTRJ(
+if (lines.length === 1) {
+  return parseMinimalTRJ(
     lines,
     row,
-    currentMonth
+    data,
+    sheetRow,
+    currentMonth,
+    mergedInfo
   );
+}
+
+return parseDetailedTRJ(
+  lines,
+  row,
+  data,
+  sheetRow,
+  currentMonth,
+  mergedInfo
+);
 }
 
 function parseMinimalTRJ(
   lines,
   row,
-  currentMonth
+  data,
+  sheetRow,
+  currentMonth,
+  mergedInfo
 ) {
 
-  return [
-    createCompetition({
-      source: SOURCES.LIGUE_BRETAGNE,
-      type: COMPETITION_TYPES.TRJ,
-      label: lines[0],
-      month: currentMonth,
-      startDay: Number(
-        row[LIGUE_CALENDAR_COLUMNS.DATE]
-      ),
-      endDay: Number(
-        row[LIGUE_CALENDAR_COLUMNS.DATE]
-      ),
-      rawData: lines[0]
-    })
-  ];
+const {
+  startDate,
+  endDate
+} = getCompetitionDates(
+  row,
+  data,
+  sheetRow,
+  mergedInfo,
+  currentMonth
+);
+
+return [
+  createCompetition({
+    source: SOURCES.LIGUE_BRETAGNE,
+    type: COMPETITION_TYPES.TRJ,
+    label: lines[0],
+    startDate,
+    endDate,
+    rawData: lines[0]
+  })
+];
 }
 
 function parseDetailedTRJ(
   lines,
   row,
-  currentMonth
+  data,
+  sheetRow,
+  currentMonth,
+  mergedInfo
 ) {
 
   const competitions = [];
 
   const label = lines[0];
+  
+  const {
+  startDate,
+  endDate
+} = getCompetitionDates(
+  row,
+  data,
+  sheetRow,
+  mergedInfo,
+  currentMonth
+);
 
   for (let i = 1; i < lines.length; i++) {
 
@@ -90,19 +117,9 @@ function parseDetailedTRJ(
 
         label,
 
-        month: currentMonth,
+		startDate,
 
-        startDay: Number(
-          row[
-            LIGUE_CALENDAR_COLUMNS.DATE
-          ]
-        ),
-
-        endDay: Number(
-          row[
-            LIGUE_CALENDAR_COLUMNS.DATE
-          ]
-        ),
+		endDate,
 
         city,
 

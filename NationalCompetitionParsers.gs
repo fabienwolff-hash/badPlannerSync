@@ -2,7 +2,8 @@ function getCompetitionDates(
   row,
   data,
   sheetRow,
-  mergedInfo
+  mergedInfo,
+  currentMonth
 ) {
 
   const startDay = Number(
@@ -24,10 +25,19 @@ function getCompetitionDates(
       ]
     );
   }
-
+  
   return {
-    startDay,
-    endDay
+    startDate: buildDate(
+      SEASON_YEAR,
+      currentMonth,
+      startDay
+    ),
+
+    endDate: buildDate(
+      SEASON_YEAR,
+      currentMonth,
+      endDay
+    )
   };
 }
 
@@ -40,30 +50,26 @@ function parseBAC(
   mergedInfo
 ) {
 
-  const lines = cell
-    .split('\n')
-    .map(line => line.trim())
-    .filter(Boolean);
-
+ const lines = extractLines(cell);
   const location = extractLocation(lines);
 
-  const {
-    startDay,
-    endDay
-  } = getCompetitionDates(
-    row,
-    data,
-    sheetRow,
-    mergedInfo
-  );
+const {
+  startDate,
+  endDate
+} = getCompetitionDates(
+  row,
+  data,
+  sheetRow,
+  mergedInfo,
+  currentMonth
+);
 
 return createCompetition({
   source: SOURCES.LIGUE_BRETAGNE,
   type: COMPETITION_TYPES.BAC,
   label: lines[0],
-  month: currentMonth,
-  startDay,
-  endDay,
+  startDate,
+  endDate,
   location,
   rawData: cell
 });
@@ -79,28 +85,59 @@ function parseBNP(
   mergedInfo
 ) {
 
-  const lines = cell
-    .split('\n')
-    .map(line => line.trim())
-    .filter(Boolean);
+const lines = extractLines(cell);
 
-  const {
-    startDay,
-    endDay
-  } = getCompetitionDates(
-    row,
-    data,
-    sheetRow,
-    mergedInfo
-  );
+const {
+  startDate,
+  endDate
+} = getCompetitionDates(
+  row,
+  data,
+  sheetRow,
+  mergedInfo,
+  currentMonth
+);
 
 return createCompetition({
   source: SOURCES.LIGUE_BRETAGNE,
   type: COMPETITION_TYPES.BNP,
   label: lines.join(' '),
-  month: currentMonth,
-  startDay,
-  endDay,
+  startDate,
+  endDate,
   rawData: cell
 });
+}
+
+function parseCEJ(
+  cell,
+  row,
+  data,
+  sheetRow,
+  currentMonth,
+  mergedInfo
+) {
+  const lines = extractLines(cell);
+
+  const location = extractLocation(lines);
+
+  const {
+    startDate,
+    endDate
+  } = getCompetitionDates(
+    row,
+    data,
+    sheetRow,
+    mergedInfo,
+    currentMonth
+  );
+
+  return createCompetition({
+    source: SOURCES.LIGUE_BRETAGNE,
+    type: COMPETITION_TYPES.CEJ,
+    label: lines[0],
+    startDate,
+    endDate,
+    location,
+    rawData: cell
+  });
 }

@@ -42,7 +42,7 @@ function parseNationalCompetitions(calendar) {
     if (!cell) {
       return;
     }
-
+	
     const firstLine =
       cell.split('\n')[0].trim();
 
@@ -92,6 +92,21 @@ function parseNationalCompetitions(calendar) {
 		);
 
 		break;
+		
+	  case COMPETITION_TYPES.CEJ:
+
+		  competitions.push(
+			parseCEJ(
+			  cell,
+			  row,
+			  data,
+			  sheetRow,
+			  currentMonth,
+			  mergedInfo
+			)
+		  );
+
+		  break;
 	}
 
   });
@@ -104,6 +119,10 @@ function parseRegionalCompetitions(calendar) {
   const competitions = [];
 
   const data = calendar.values;
+  
+  const mergedIndex = buildMergedRangesIndex(
+    calendar.mergedRanges
+  );
 
   let currentMonth = null;
 
@@ -135,6 +154,14 @@ function parseRegionalCompetitions(calendar) {
     ) {
       return;
     }
+	
+	const mergedInfo =
+		getMergedInfo(
+		mergedIndex,
+		sheetRow,
+		LIGUE_CALENDAR_COLUMNS.REGIONAL +
+		SHEET_INDEX_OFFSET
+		);
 
     competitions.push(
       ...parseTRJ(
@@ -143,7 +170,7 @@ function parseRegionalCompetitions(calendar) {
         data,
         sheetRow,
         currentMonth,
-        null
+        mergedInfo
       )
     );
 
