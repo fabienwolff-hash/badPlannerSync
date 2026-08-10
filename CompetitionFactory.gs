@@ -1,29 +1,29 @@
 function createCompetition(data) {
-  return {
+
+  const competition = {
     source: data.source,
     type: data.type,
-
-    scope:
-      TYPE_SCOPE_MAPPING[data.type] ||
-      null,
-
+    scope: data.scope || TYPE_SCOPE_MAPPING[data.type],
     label: data.label,
-
-	startDate: data.startDate,
-	endDate: data.endDate,
-    
+    startDate: data.startDate,
+    endDate: data.endDate,
     rawData: data.rawData,
 
     ...(data.location && {
       location: data.location
     }),
 
-    ...(data.categories && {
-      categories: data.categories
-    }),
-
     ...(data.city && {
       city: data.city
+    }),
+
+    ...(data.categories && {
+      categories: data.categories
     })
   };
+
+  competition.tournamentId =
+    buildTournamentId(competition);
+
+  return competition;
 }

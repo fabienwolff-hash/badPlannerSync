@@ -132,3 +132,46 @@ function parseDetailedTRJ(
 
   return competitions;
 }
+
+function parseTIJ(
+  cell,
+  row,
+  data,
+  sheetRow,
+  currentMonth,
+  mergedInfo
+) {
+
+  const {
+    startDate,
+    endDate
+  } = getCompetitionDates(
+    row,
+    data,
+    sheetRow,
+    mergedInfo,
+    currentMonth
+  );
+
+  return [
+
+    createCompetition({
+      source: SOURCES.LIGUE_BRETAGNE,
+      type: COMPETITION_TYPES.TIJ,
+      label: cell.trim(),
+      startDate,
+      endDate: startDate,
+      rawData: cell
+    }),
+
+    createCompetition({
+      source: SOURCES.LIGUE_BRETAGNE,
+      type: COMPETITION_TYPES.TIJ,
+      label: cell.trim(),
+      startDate: addDays(startDate, 1),
+      endDate: addDays(startDate, 1),
+      rawData: cell
+    })
+
+  ];
+}

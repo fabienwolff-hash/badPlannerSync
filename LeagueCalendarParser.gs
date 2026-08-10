@@ -148,12 +148,9 @@ function parseRegionalCompetitions(calendar) {
     const competitionType =
       getCompetitionType(firstLine);
 
-    if (
-      competitionType !==
-      COMPETITION_TYPES.TRJ
-    ) {
-      return;
-    }
+	if (!competitionType) {
+	  return;
+	}
 	
 	const mergedInfo =
 		getMergedInfo(
@@ -163,16 +160,38 @@ function parseRegionalCompetitions(calendar) {
 		SHEET_INDEX_OFFSET
 		);
 
-    competitions.push(
-      ...parseTRJ(
-        cell,
-        row,
-        data,
-        sheetRow,
-        currentMonth,
-        mergedInfo
-      )
-    );
+	switch (competitionType) {
+
+	  case COMPETITION_TYPES.TRJ:
+
+		competitions.push(
+		  ...parseTRJ(
+			cell,
+			row,
+			data,
+			sheetRow,
+			currentMonth,
+			mergedInfo
+		  )
+		);
+
+		break;
+
+	  case COMPETITION_TYPES.TIJ:
+
+		competitions.push(
+		  ...parseTIJ(
+			cell,
+			row,
+			data,
+			sheetRow,
+			currentMonth,
+			mergedInfo
+		  )
+		);
+
+		break;
+	}
 
   });
 

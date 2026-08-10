@@ -28,3 +28,15 @@ function extractLines(cell) {
     .map(line => line.trim())
     .filter(Boolean);
 }
+
+function addDays(dateString, days) {
+  const date = new Date(dateString);
+
+  date.setDate(date.getDate() + days);
+
+  return Utilities.formatDate(
+    date,
+    Session.getScriptTimeZone(),
+    "yyyy-MM-dd"
+  );
+}

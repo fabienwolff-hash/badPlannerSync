@@ -52,7 +52,9 @@ const COMPETITION_TYPES = {
   TRJ: "TRJ",
   TDJ: "TDJ",
   CDJ: "CDJ",
-  PROMOBAD: "Promobad"
+  PROMOBAD: "Promobad",
+  CHAMPIONNAT: "Championnat",
+  INTERCLUB: "Interclub"
 };
 
 const SOURCES = {

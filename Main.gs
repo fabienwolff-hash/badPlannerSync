@@ -4,6 +4,7 @@ function main() {
     loadLeagueCalendar();
 
   const competitions = [
+
     ...parseNationalCompetitions(
       calendar
     ),
@@ -11,13 +12,10 @@ function main() {
     ...parseRegionalCompetitions(
       calendar
     )
+
   ];
 
-  Logger.log(
-    JSON.stringify(
-      competitions,
-      null,
-      2
-    )
+  writeSnapshot(
+    competitions
   );
 }
