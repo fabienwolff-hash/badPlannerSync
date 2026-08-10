@@ -24,7 +24,7 @@ function writeSnapshot(competitions) {
   sheet
     .getRange(1, 1, 1, headers.length)
     .setValues([headers]);
-
+	
 	const sortedCompetitions = [...competitions].sort(
 	  (a, b) => {
 		const dateComparison =

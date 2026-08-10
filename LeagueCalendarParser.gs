@@ -1,20 +1,3 @@
-function buildMergedRangesIndex(mergedRanges) {
-  const index = {};
-
-  mergedRanges.forEach(range => {
-    const key = `${range.getRow()}-${range.getColumn()}`;
-
-    index[key] = {
-      row: range.getRow(),
-      column: range.getColumn(),
-      numRows: range.getNumRows(),
-      numColumns: range.getNumColumns()
-    };
-  });
-
-  return index;
-}
-
 function parseNationalCompetitions(calendar) {
 
   const competitions = [];
@@ -107,7 +90,7 @@ function parseNationalCompetitions(calendar) {
 
 		  break;
 		  
-	case "QUALIFICATION_FRANCE_JEUNES":
+	case CALENDAR_COMPETITION_TYPES.QUALIFICATION_FRANCE_JEUNES:
 
 		  competitions.push(
 			parseQualificationFranceJeunes(
@@ -122,7 +105,7 @@ function parseNationalCompetitions(calendar) {
 
 		  break;
 
-	case "CHAMPIONNATS_FRANCE_JEUNES":
+	case CALENDAR_COMPETITION_TYPES.CHAMPIONNATS_FRANCE_JEUNES:
 
 		  competitions.push(
 			parseChampionnatsFranceJeunes(
@@ -220,7 +203,7 @@ function parseRegionalCompetitions(calendar) {
 
 		break;
 		
-		case COMPETITION_TYPES.CHAMPIONNAT_BRETAGNE_JEUNES:
+		case CALENDAR_COMPETITION_TYPES.CHAMPIONNAT_BRETAGNE_JEUNES:
 
 		  competitions.push(
 			parseChampionnatBretagneJeunes(
@@ -235,7 +218,7 @@ function parseRegionalCompetitions(calendar) {
 
 		  break;
 		  
-		case COMPETITION_TYPES.CHAMPIONNATS_DEPARTEMENTAUX_JEUNES:
+		case CALENDAR_COMPETITION_TYPES.CHAMPIONNATS_DEPARTEMENTAUX_JEUNES:
 
 		  competitions.push(
 			parseChampionnatsDepartementauxJeunes(
@@ -250,7 +233,7 @@ function parseRegionalCompetitions(calendar) {
 
 		  break;
 		  
-		case COMPETITION_TYPES.INTERCLUB_REGIONAL:
+		case CALENDAR_COMPETITION_TYPES.INTERCLUB_REGIONAL:
 
 		  competitions.push(
 			parseFinaleRegionaleInterclubsJeunes(
@@ -269,23 +252,6 @@ function parseRegionalCompetitions(calendar) {
   });
 
   return competitions;
-}
-
-function extractCity(lines) {
-  return lines[1]
-    .replace('(', '')
-    .replace(')', '')
-    .trim();
-}
-
-function getMergedInfo(
-  mergedIndex,
-  row,
-  column
-) {
-  return mergedIndex[
-    `${row}-${column}`
-  ] || null;
 }
 
 function getCompetitionType(label) {
@@ -337,32 +303,41 @@ function getCompetitionType(label) {
   if (
 	  label.startsWith(CALENDAR_LABELS.QUALIFICATION_FRANCE)
 	) {
-	  return COMPETITION_TYPES.QUALIFICATION_FRANCE_JEUNES;
+	  return CALENDAR_COMPETITION_TYPES.QUALIFICATION_FRANCE_JEUNES;
 	}
 
 	if (
 	  label.startsWith(CALENDAR_LABELS.CHAMPIONNATS_FRANCE)
 	) {
-	  return COMPETITION_TYPES.CHAMPIONNATS_FRANCE_JEUNES;
+	  return CALENDAR_COMPETITION_TYPES.CHAMPIONNATS_FRANCE_JEUNES;
 	}
 	
 	if (
 	  label.startsWith(CALENDAR_LABELS.CHAMPIONNAT_BRETAGNE)
 	) {
-	  return COMPETITION_TYPES.CHAMPIONNAT_BRETAGNE_JEUNES;
+	  return CALENDAR_COMPETITION_TYPES.CHAMPIONNAT_BRETAGNE_JEUNES;
 	}
 	
 	if (
 	  label.startsWith(CALENDAR_LABELS.CHAMPIONNATS_DEPARTEMENTAUX)
 	) {
-	  return COMPETITION_TYPES.CHAMPIONNATS_DEPARTEMENTAUX_JEUNES;
+	  return CALENDAR_COMPETITION_TYPES.CHAMPIONNATS_DEPARTEMENTAUX_JEUNES;
 	}
 	
 	if (
 	  label.startsWith(CALENDAR_LABELS.FINALE_REGIONALE_INTERCLUBS)
 	) {
-	  return COMPETITION_TYPES.INTERCLUB_REGIONAL;
+	  return CALENDAR_COMPETITION_TYPES.INTERCLUB_REGIONAL;
 	}
+
+  if (label.startsWith('CDJ')) {
+    return COMPETITION_TYPES.CDJ;
+  }
+
+  if (label.startsWith('TDJ')) {
+    return COMPETITION_TYPES.TDJ;
+  }
 
   return null;
 }
+

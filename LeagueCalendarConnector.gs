@@ -1,10 +1,10 @@
 function loadLeagueCalendar() {
   const spreadsheet = SpreadsheetApp.openById(
-    CONFIG.LIGUE_SPREADSHEET_ID
+    LIGUE_CALENDAR_CONFIG.LIGUE_SPREADSHEET_ID
   );
 
   const sheet = spreadsheet.getSheetByName(
-    CONFIG.LIGUE_SHEET_NAME
+    LIGUE_CALENDAR_CONFIG.LIGUE_SHEET_NAME
   );
 
   const range = sheet.getDataRange();

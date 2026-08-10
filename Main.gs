@@ -11,7 +11,15 @@ function main() {
 
     ...parseRegionalCompetitions(
       calendar
-    )
+    ),
+	
+	...parsePromobadCompetitions(
+	  calendar
+	),
+
+	...parseYouthCompetitions(
+	  calendar
+	)
 
   ];
 

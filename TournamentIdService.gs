@@ -2,13 +2,13 @@ function buildTournamentId(competition) {
   switch (competition.type) {
 
     case COMPETITION_TYPES.BAC:
-      return buildBacTournamentId(competition);
+      return buildNumberedTournamentId('BAC',competition);
 
     case COMPETITION_TYPES.BNP:
-      return buildBnpTournamentId(competition);
+      return buildNumberedTournamentId('BNP',competition);
 
     case COMPETITION_TYPES.CEJ:
-      return buildCejTournamentId(competition);
+      return buildNumberedTournamentId('CEJ',competition);
 
     case COMPETITION_TYPES.TRJ:
       return buildTrjTournamentId(competition);
@@ -22,6 +22,15 @@ function buildTournamentId(competition) {
 	case COMPETITION_TYPES.INTERCLUB:
 		return buildInterclubTournamentId(competition);
 		
+	case COMPETITION_TYPES.PROMOBAD:
+	    return buildPromobadTournamentId(competition);
+		
+	case COMPETITION_TYPES.CDJ:
+	    return buildCdjTournamentId(competition);
+
+	case COMPETITION_TYPES.TDJ:
+	    return buildTdjTournamentId(competition);
+		
     default:
       return null;
   }
@@ -31,7 +40,7 @@ function getMonthFromDate(date) {
   return date.substring(5, 7);
 }
 
-function extractNumber(label) {
+function extractTournamentNumber(label) {
   const match = label.match(/(\d+)/);
 
   if (!match) {
@@ -41,40 +50,21 @@ function extractNumber(label) {
   return match[1].padStart(2, "0");
 }
 
-function buildBacTournamentId(competition) {
-  const month = getMonthFromDate(
-    competition.startDate
-  );
+function buildNumberedTournamentId(
+  prefix,
+  competition
+) {
+  const month =
+    getMonthFromDate(
+      competition.startDate
+    );
 
-  const number = extractNumber(
-    competition.label
-  );
+  const number =
+    extractTournamentNumber(
+      competition.label
+    );
 
-  return `BAC-${month}-${number}`;
-}
-
-function buildBnpTournamentId(competition) {
-  const month = getMonthFromDate(
-    competition.startDate
-  );
-
-  const number = extractNumber(
-    competition.label
-  );
-
-  return `BNP-${month}-${number}`;
-}
-
-function buildCejTournamentId(competition) {
-  const month = getMonthFromDate(
-    competition.startDate
-  );
-
-  const number = extractNumber(
-    competition.label
-  );
-
-  return `CEJ-${month}-${number}`;
+  return `${prefix}-${month}-${number}`;
 }
 
 function buildTrjTournamentId(competition) {
@@ -99,7 +89,7 @@ function buildTijTournamentId(competition) {
     competition.startDate
   );
 
-  const number = extractNumber(
+  const number = extractTournamentNumber(
     competition.label
   );
 
@@ -141,4 +131,48 @@ function buildInterclubTournamentId(
   );
 
   return `IC-${month}-REGIONAL`;
+}
+
+function buildPromobadTournamentId(
+  competition
+) {
+  return buildCityBasedTournamentId(
+    'PRO',
+    competition
+  );
+}
+
+function buildCityBasedTournamentId(
+  prefix,
+  competition
+) {
+  const month = getMonthFromDate(
+    competition.startDate
+  );
+
+  const city = competition.city
+    .toUpperCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^A-Z0-9]/g, '-');
+
+  return `${prefix}-${month}-${city}`;
+}
+
+function buildCdjTournamentId(
+  competition
+) {
+  return buildCityBasedTournamentId(
+    'CDJ',
+    competition
+  );
+}
+
+function buildTdjTournamentId(
+  competition
+) {
+  return buildCityBasedTournamentId(
+    'TDJ',
+    competition
+  );
 }

@@ -222,39 +222,6 @@ function parseChampionnatBretagneJeunes(
   });
 }
 
-function parseChampionnatsDepartementauxJeunes(
-  cell,
-  row,
-  data,
-  sheetRow,
-  currentMonth,
-  mergedInfo
-) {
-
-  const {
-    startDate,
-    endDate
-  } = getCompetitionDates(
-    row,
-    data,
-    sheetRow,
-    mergedInfo,
-    currentMonth
-  );
-
-  return createCompetition({
-    source: SOURCES.LIGUE_BRETAGNE,
-    type: COMPETITION_TYPES.CHAMPIONNAT,
-    scope: SCOPES.DEPARTEMENTALE,
-    label: "Championnats Départementaux Jeunes",
-
-    startDate,
-    endDate,
-
-    rawData: cell
-  });
-}
-
 function parseFinaleRegionaleInterclubsJeunes(
   cell,
   row,
