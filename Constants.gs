@@ -54,8 +54,11 @@ const COMPETITION_TYPES = {
   CDJ: "CDJ",
   PROMOBAD: "Promobad",
   CHAMPIONNAT: "Championnat",
-  INTERCLUB: "Interclub"
+  INTERCLUB: "Interclub",
+  QUALIFICATION_FRANCE_JEUNES: "QUALIFICATION_FRANCE_JEUNES",
+  CHAMPIONNATS_FRANCE_JEUNES: "CHAMPIONNATS_FRANCE_JEUNES"
 };
+
 
 const SOURCES = {
   LIGUE_BRETAGNE: "LIGUE_BRETAGNE"
@@ -66,7 +69,9 @@ const CALENDAR_LABELS = {
   CEJ: "CEJ",
   TIJ: "TIJ",
   TRJ: "TRJ",
-  BRASSAGE_NATIONAL: "Brassage National"
+  BRASSAGE_NATIONAL: "Brassage National",
+  QUALIFICATION_FRANCE: "Qualification France",
+  CHAMPIONNATS_FRANCE: "Championnats de France"
 };
 
 const SHEET_INDEX_OFFSET = 1;

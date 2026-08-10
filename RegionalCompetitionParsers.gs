@@ -50,6 +50,11 @@ const {
   currentMonth
 );
 
+const department =
+  extractDepartmentFromTRJLabel(
+    lines[0]
+  );
+
 return [
   createCompetition({
     source: SOURCES.LIGUE_BRETAGNE,
@@ -57,6 +62,7 @@ return [
     label: lines[0],
     startDate,
     endDate,
+	department,
     rawData: lines[0]
   })
 ];
@@ -152,6 +158,11 @@ function parseTIJ(
     mergedInfo,
     currentMonth
   );
+  
+  const region =
+  extractRegionFromTIJLabel(
+    cell.trim()
+  );
 
   return [
 
@@ -161,6 +172,7 @@ function parseTIJ(
       label: cell.trim(),
       startDate,
       endDate: startDate,
+	  region,
       rawData: cell
     }),
 
@@ -170,6 +182,7 @@ function parseTIJ(
       label: cell.trim(),
       startDate: addDays(startDate, 1),
       endDate: addDays(startDate, 1),
+	  region,
       rawData: cell
     })
 

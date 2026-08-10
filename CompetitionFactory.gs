@@ -9,13 +9,17 @@ function createCompetition(data) {
     endDate: data.endDate,
     rawData: data.rawData,
 
-    ...(data.location && {
-      location: data.location
-    }),
-
     ...(data.city && {
       city: data.city
     }),
+	
+	...(data.region && {
+	  region: data.region
+	}),
+
+	...(data.department && {
+	  department: data.department
+	}),
 
     ...(data.categories && {
       categories: data.categories

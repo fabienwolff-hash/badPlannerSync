@@ -15,6 +15,9 @@ function buildTournamentId(competition) {
 
     case COMPETITION_TYPES.TIJ:
       return buildTijTournamentId(competition);
+	  
+	case COMPETITION_TYPES.CHAMPIONNAT:
+		return buildChampionnatTournamentId(competition); 
 
     default:
       return null;
@@ -98,4 +101,25 @@ function buildTijTournamentId(competition) {
   );
 
   return `TIJ-${month}-N${Number(number)}`;
+}
+
+function buildChampionnatTournamentId(
+  competition
+) {
+
+  const month = getMonthFromDate(
+    competition.startDate
+  );
+
+  switch (competition.label) {
+
+    case "Qualification France Jeunes":
+      return `CHP-${month}-FRANCE-QLF`;
+
+    case "Championnats de France Jeunes":
+      return `CHP-${month}-FRANCE`;
+
+    default:
+      return `CHP-${month}`;
+  }
 }

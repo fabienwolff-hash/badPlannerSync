@@ -51,7 +51,7 @@ function parseBAC(
 ) {
 
  const lines = extractLines(cell);
-  const location = extractLocation(lines);
+  const city = extractCity(lines);
 
 const {
   startDate,
@@ -70,7 +70,7 @@ return createCompetition({
   label: lines[0],
   startDate,
   endDate,
-  location,
+  city,
   rawData: cell
 });
 }
@@ -118,7 +118,7 @@ function parseCEJ(
 ) {
   const lines = extractLines(cell);
 
-  const location = extractLocation(lines);
+  const city = extractCity(lines);
 
   const {
     startDate,
@@ -137,7 +137,78 @@ function parseCEJ(
     label: lines[0],
     startDate,
     endDate,
-    location,
+    city,
+    rawData: cell
+  });
+}
+
+function parseQualificationFranceJeunes(
+  cell,
+  row,
+  data,
+  sheetRow,
+  currentMonth,
+  mergedInfo
+) {
+
+  const {
+    startDate,
+    endDate
+  } = getCompetitionDates(
+    row,
+    data,
+    sheetRow,
+    mergedInfo,
+    currentMonth
+  );
+
+  return createCompetition({
+    source: SOURCES.LIGUE_BRETAGNE,
+    type: COMPETITION_TYPES.CHAMPIONNAT,
+    scope: "Nationale",
+    label: "Qualification France Jeunes",
+    startDate,
+    endDate,
+    rawData: cell
+  });
+}
+
+function parseChampionnatsFranceJeunes(
+  cell,
+  row,
+  data,
+  sheetRow,
+  currentMonth,
+  mergedInfo
+) {
+
+  const lines = extractLines(cell);
+
+  const {
+    startDate,
+    endDate
+  } = getCompetitionDates(
+    row,
+    data,
+    sheetRow,
+    mergedInfo,
+    currentMonth
+  );
+
+  const locationInfo =
+    extractCityAndDepartment(
+      lines[2]
+    );
+
+  return createCompetition({
+    source: SOURCES.LIGUE_BRETAGNE,
+    type: COMPETITION_TYPES.CHAMPIONNAT,
+    scope: "Nationale",
+    label: "Championnats de France Jeunes",
+    startDate,
+    endDate,
+    city: locationInfo?.city,
+    department: locationInfo?.department,
     rawData: cell
   });
 }

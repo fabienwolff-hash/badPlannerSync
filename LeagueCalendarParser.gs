@@ -107,6 +107,36 @@ function parseNationalCompetitions(calendar) {
 		  );
 
 		  break;
+		  
+	case "QUALIFICATION_FRANCE_JEUNES":
+
+		  competitions.push(
+			parseQualificationFranceJeunes(
+			  cell,
+			  row,
+			  data,
+			  sheetRow,
+			  currentMonth,
+			  mergedInfo
+			)
+		  );
+
+		  break;
+
+	case "CHAMPIONNATS_FRANCE_JEUNES":
+
+		  competitions.push(
+			parseChampionnatsFranceJeunes(
+			  cell,
+			  row,
+			  data,
+			  sheetRow,
+			  currentMonth,
+			  mergedInfo
+			)
+		  );
+
+		  break;	
 	}
 
   });
@@ -198,7 +228,7 @@ function parseRegionalCompetitions(calendar) {
   return competitions;
 }
 
-function extractLocation(lines) {
+function extractCity(lines) {
   return lines[1]
     .replace('(', '')
     .replace(')', '')
@@ -260,6 +290,18 @@ function getCompetitionType(label) {
   ) {
     return COMPETITION_TYPES.BNP;
   }
+  
+  if (
+	  label.startsWith(CALENDAR_LABELS.QUALIFICATION_FRANCE)
+	) {
+	  return COMPETITION_TYPES.QUALIFICATION_FRANCE_JEUNES;
+	}
+
+	if (
+	  label.startsWith(CALENDAR_LABELS.CHAMPIONNATS_FRANCE)
+	) {
+	  return COMPETITION_TYPES.CHAMPIONNATS_FRANCE_JEUNES;
+	}
 
   return null;
 }

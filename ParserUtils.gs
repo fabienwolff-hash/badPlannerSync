@@ -22,13 +22,6 @@ function buildDate(
   return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
 }
 
-function extractLines(cell) {
-  return cell
-    .split('\n')
-    .map(line => line.trim())
-    .filter(Boolean);
-}
-
 function addDays(dateString, days) {
   const date = new Date(dateString);
 
@@ -39,4 +32,49 @@ function addDays(dateString, days) {
     Session.getScriptTimeZone(),
     "yyyy-MM-dd"
   );
+}
+
+function extractLines(cell) {
+  return cell
+    .split('\n')
+    .map(line => line.trim())
+    .filter(Boolean);
+}
+
+function extractCityAndDepartment(value) {
+
+  const match =
+    value.match(/^(.+?)\s*\((\d+)\)$/);
+
+  if (!match) {
+    return null;
+  }
+
+  return {
+    city: match[1].trim(),
+    department: match[2]
+  };
+}
+
+function extractDepartmentFromTRJLabel(label) {
+
+  const match = label.match(/\((\d+)\)$/);
+
+  if (!match) {
+    return null;
+  }
+
+  return match[1];
+}
+
+function extractRegionFromTIJLabel(label) {
+
+  const match =
+    label.match(/^TIJ\s+\d+\s+(.+)$/i);
+
+  if (!match) {
+    return null;
+  }
+
+  return match[1].trim();
 }

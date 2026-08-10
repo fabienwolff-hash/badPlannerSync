@@ -14,7 +14,8 @@ function writeSnapshot(competitions) {
     'Label',
     'StartDate',
     'EndDate',
-    'Location',
+	'Region',
+    'Department',
     'City',
     'Categories',
     'RawData'
@@ -48,7 +49,8 @@ function writeSnapshot(competitions) {
       competition.label || '',
       competition.startDate || '',
       competition.endDate || '',
-      competition.location || '',
+	  competition.region || '',
+      competition.department || '',
       competition.city || '',
       competition.categories
         ? competition.categories.join(';')
