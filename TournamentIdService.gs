@@ -17,8 +17,11 @@ function buildTournamentId(competition) {
       return buildTijTournamentId(competition);
 	  
 	case COMPETITION_TYPES.CHAMPIONNAT:
-		return buildChampionnatTournamentId(competition); 
-
+		return buildChampionnatTournamentId(competition);
+		
+	case COMPETITION_TYPES.INTERCLUB:
+		return buildInterclubTournamentId(competition);
+		
     default:
       return null;
   }
@@ -118,8 +121,24 @@ function buildChampionnatTournamentId(
 
     case "Championnats de France Jeunes":
       return `CHP-${month}-FRANCE`;
+	  
+	case "Championnat de Bretagne Jeunes":
+	  return `CHP-${month}-BRETAGNE`;
+	  
+	case "Championnats Départementaux Jeunes":
+	  return `CHP-${month}-DEPARTEMENTAL`;
 
     default:
       return `CHP-${month}`;
   }
+}
+
+function buildInterclubTournamentId(
+  competition
+) {
+  const month = getMonthFromDate(
+    competition.startDate
+  );
+
+  return `IC-${month}-REGIONAL`;
 }

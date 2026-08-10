@@ -41,6 +41,10 @@ function extractLines(cell) {
     .filter(Boolean);
 }
 
+function buildNormalizedLabel(cell) {
+  return extractLines(cell).join(' ');
+}
+
 function extractCityAndDepartment(value) {
 
   const match =

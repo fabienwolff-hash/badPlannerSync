@@ -188,3 +188,102 @@ function parseTIJ(
 
   ];
 }
+
+function parseChampionnatBretagneJeunes(
+  cell,
+  row,
+  data,
+  sheetRow,
+  currentMonth,
+  mergedInfo
+) {
+
+  const {
+    startDate,
+    endDate
+  } = getCompetitionDates(
+    row,
+    data,
+    sheetRow,
+    mergedInfo,
+    currentMonth
+  );
+
+  return createCompetition({
+    source: SOURCES.LIGUE_BRETAGNE,
+    type: COMPETITION_TYPES.CHAMPIONNAT,
+    scope: SCOPES.REGIONALE,
+    label: "Championnat de Bretagne Jeunes",
+
+    startDate,
+    endDate,
+
+    rawData: cell
+  });
+}
+
+function parseChampionnatsDepartementauxJeunes(
+  cell,
+  row,
+  data,
+  sheetRow,
+  currentMonth,
+  mergedInfo
+) {
+
+  const {
+    startDate,
+    endDate
+  } = getCompetitionDates(
+    row,
+    data,
+    sheetRow,
+    mergedInfo,
+    currentMonth
+  );
+
+  return createCompetition({
+    source: SOURCES.LIGUE_BRETAGNE,
+    type: COMPETITION_TYPES.CHAMPIONNAT,
+    scope: SCOPES.DEPARTEMENTALE,
+    label: "Championnats Départementaux Jeunes",
+
+    startDate,
+    endDate,
+
+    rawData: cell
+  });
+}
+
+function parseFinaleRegionaleInterclubsJeunes(
+  cell,
+  row,
+  data,
+  sheetRow,
+  currentMonth,
+  mergedInfo
+) {
+
+  const {
+    startDate,
+    endDate
+  } = getCompetitionDates(
+    row,
+    data,
+    sheetRow,
+    mergedInfo,
+    currentMonth
+  );
+
+  return createCompetition({
+    source: SOURCES.LIGUE_BRETAGNE,
+    type: COMPETITION_TYPES.INTERCLUB,
+    scope: SCOPES.REGIONALE,
+    label: 'Finale Régionale Interclubs Jeunes',
+
+    startDate,
+    endDate,
+
+    rawData: cell
+  });
+}

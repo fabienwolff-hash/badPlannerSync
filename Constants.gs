@@ -9,6 +9,13 @@ const TYPE_SCOPE_MAPPING = {
   CEJ: "Nationale",
 };
 
+const SCOPES = {
+  DEPARTEMENTALE: "Départementale",
+  REGIONALE: "Régionale",
+  INTER_REGIONALE: "Inter-Régionale",
+  NATIONALE: "Nationale"
+};
+
 const SHEETS = {
   SNAPSHOT_CURRENT: "SNAPSHOT_CURRENT",
   SNAPSHOT_PREVIOUS: "SNAPSHOT_PREVIOUS",
@@ -56,9 +63,11 @@ const COMPETITION_TYPES = {
   CHAMPIONNAT: "Championnat",
   INTERCLUB: "Interclub",
   QUALIFICATION_FRANCE_JEUNES: "QUALIFICATION_FRANCE_JEUNES",
-  CHAMPIONNATS_FRANCE_JEUNES: "CHAMPIONNATS_FRANCE_JEUNES"
+  CHAMPIONNATS_FRANCE_JEUNES: "CHAMPIONNATS_FRANCE_JEUNES",
+  CHAMPIONNAT_BRETAGNE_JEUNES: "CHAMPIONNAT_BRETAGNE_JEUNES",
+  CHAMPIONNATS_DEPARTEMENTAUX_JEUNES: "CHAMPIONNATS_DEPARTEMENTAUX_JEUNES",
+  INTERCLUB_REGIONAL: 'INTERCLUB_REGIONAL'
 };
-
 
 const SOURCES = {
   LIGUE_BRETAGNE: "LIGUE_BRETAGNE"
@@ -71,7 +80,10 @@ const CALENDAR_LABELS = {
   TRJ: "TRJ",
   BRASSAGE_NATIONAL: "Brassage National",
   QUALIFICATION_FRANCE: "Qualification France",
-  CHAMPIONNATS_FRANCE: "Championnats de France"
+  CHAMPIONNATS_FRANCE: "Championnats de France",
+  CHAMPIONNAT_BRETAGNE: "Championnat de Bretagne",
+  CHAMPIONNATS_DEPARTEMENTAUX: "Championnats Départementaux",
+  FINALE_REGIONALE_INTERCLUBS: "Finale Régionale Interclubs"
 };
 
 const SHEET_INDEX_OFFSET = 1;
@@ -93,4 +105,8 @@ const MONTHS = {
 
 const SEASON_YEAR = 2026;
 
-const IGNORED_LABELS = ['Limite Régionaux jeunes'];
+//On ignore Intercomité Bretagne car on ne sait pas a quoi ça correspond
+const IGNORED_LABELS = [
+	'Limite Régionaux jeunes',
+	'Intercomité Bretagne'
+	];

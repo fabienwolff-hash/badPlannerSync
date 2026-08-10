@@ -165,7 +165,7 @@ function parseQualificationFranceJeunes(
   return createCompetition({
     source: SOURCES.LIGUE_BRETAGNE,
     type: COMPETITION_TYPES.CHAMPIONNAT,
-    scope: "Nationale",
+    scope: SCOPES.NATIONALE,
     label: "Qualification France Jeunes",
     startDate,
     endDate,
@@ -203,7 +203,7 @@ function parseChampionnatsFranceJeunes(
   return createCompetition({
     source: SOURCES.LIGUE_BRETAGNE,
     type: COMPETITION_TYPES.CHAMPIONNAT,
-    scope: "Nationale",
+    scope: SCOPES.NATIONALE,
     label: "Championnats de France Jeunes",
     startDate,
     endDate,

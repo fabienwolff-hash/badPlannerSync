@@ -43,12 +43,11 @@ function parseNationalCompetitions(calendar) {
       return;
     }
 	
-    const firstLine =
-      cell.split('\n')[0].trim();
+	const normalizedLabel = buildNormalizedLabel(cell);
 
-    const competitionType =
-      getCompetitionType(firstLine);
-
+	const competitionType =
+	  getCompetitionType(normalizedLabel);
+	
     if (!competitionType) {
       return;
     }
@@ -171,12 +170,11 @@ function parseRegionalCompetitions(calendar) {
     if (!cell) {
       return;
     }
-
-    const firstLine =
-      cell.split('\n')[0].trim();
-
+ 
+	const normalizedLabel = buildNormalizedLabel(cell);
+	
     const competitionType =
-      getCompetitionType(firstLine);
+      getCompetitionType(normalizedLabel);
 
 	if (!competitionType) {
 	  return;
@@ -221,6 +219,51 @@ function parseRegionalCompetitions(calendar) {
 		);
 
 		break;
+		
+		case COMPETITION_TYPES.CHAMPIONNAT_BRETAGNE_JEUNES:
+
+		  competitions.push(
+			parseChampionnatBretagneJeunes(
+			  cell,
+			  row,
+			  data,
+			  sheetRow,
+			  currentMonth,
+			  mergedInfo
+			)
+		  );
+
+		  break;
+		  
+		case COMPETITION_TYPES.CHAMPIONNATS_DEPARTEMENTAUX_JEUNES:
+
+		  competitions.push(
+			parseChampionnatsDepartementauxJeunes(
+			  cell,
+			  row,
+			  data,
+			  sheetRow,
+			  currentMonth,
+			  mergedInfo
+			)
+		  );
+
+		  break;
+		  
+		case COMPETITION_TYPES.INTERCLUB_REGIONAL:
+
+		  competitions.push(
+			parseFinaleRegionaleInterclubsJeunes(
+			  cell,
+			  row,
+			  data,
+			  sheetRow,
+			  currentMonth,
+			  mergedInfo
+			)
+		  );
+
+		  break;
 	}
 
   });
@@ -301,6 +344,24 @@ function getCompetitionType(label) {
 	  label.startsWith(CALENDAR_LABELS.CHAMPIONNATS_FRANCE)
 	) {
 	  return COMPETITION_TYPES.CHAMPIONNATS_FRANCE_JEUNES;
+	}
+	
+	if (
+	  label.startsWith(CALENDAR_LABELS.CHAMPIONNAT_BRETAGNE)
+	) {
+	  return COMPETITION_TYPES.CHAMPIONNAT_BRETAGNE_JEUNES;
+	}
+	
+	if (
+	  label.startsWith(CALENDAR_LABELS.CHAMPIONNATS_DEPARTEMENTAUX)
+	) {
+	  return COMPETITION_TYPES.CHAMPIONNATS_DEPARTEMENTAUX_JEUNES;
+	}
+	
+	if (
+	  label.startsWith(CALENDAR_LABELS.FINALE_REGIONALE_INTERCLUBS)
+	) {
+	  return COMPETITION_TYPES.INTERCLUB_REGIONAL;
 	}
 
   return null;
