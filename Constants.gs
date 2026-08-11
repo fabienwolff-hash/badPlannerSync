@@ -14,6 +14,15 @@ const LIGUE_CALENDAR_CONFIG = {
     "CALENDRIER SPORTIF 2026-2027"
 };
 
+const COMMITTEE35_CALENDAR_CONFIG = {
+  SPREADSHEET_ID:
+    PropertiesService.getScriptProperties().getProperty(
+      "COMMITTEE35_SPREADSHEET_ID"
+    ),
+
+  SHEET_NAME: "CALENDRIER SPORTIF 2025-2026"
+};
+
 // =================================================
 // Feuilles BPS
 // =================================================
@@ -30,7 +39,8 @@ const SHEETS = {
 // =================================================
 
 const SOURCES = {
-  LIGUE_BRETAGNE: "LIGUE_BRETAGNE"
+  LIGUE_BRETAGNE: "LIGUE_BRETAGNE",
+  COMITE_35: 'COMITE_35'
 };
 
 // =================================================
@@ -68,6 +78,7 @@ const CALENDAR_LABELS = {
   TIJ: "TIJ",
   TRJ: "TRJ",
   BRASSAGE_NATIONAL: "Brassage National",
+  BRASSAGE_ACCESSION_CEJ: "Brassage Accession CEJ",
   QUALIFICATION_FRANCE: "Qualification France",
   CHAMPIONNATS_FRANCE: "Championnats de France",
   CHAMPIONNAT_BRETAGNE: "Championnat de Bretagne",
@@ -113,6 +124,27 @@ const LIGUE_CALENDAR_COLUMNS = {
 };
 
 const SHEET_INDEX_OFFSET = 1;
+
+// =================================================
+// Colonnes du calendrier du Comite
+// =================================================
+
+const COMMITTEE35_CALENDAR_COLUMNS = {
+  MONTH: 0,
+  DATE: 2,
+
+  NATIONAL: 10,
+  REGIONAL: 11,
+  DEPARTMENTAL: 12,
+
+  PROMOBAD_LOCATION: 13,
+  PROMOBAD_DISCIPLINE: 14,
+  PROMOBAD_CATEGORIES: 15,
+
+  TDJ_LOCATION: 16,
+  TDJ_DISCIPLINE: 17,
+  TDJ_CATEGORIES: 18
+};
 
 // =================================================
 // Mapping Type → Scope

@@ -140,3 +140,93 @@ function extractCategoriesFromMergedColumns(
 
   return categories;
 }
+
+function getCompetitionType(label) {
+
+  if (!label) {
+    return null;
+  }
+
+  if (
+	  label.startsWith(
+		CALENDAR_LABELS.BAC
+	  ) ||
+	  label.startsWith(
+		CALENDAR_LABELS.BRASSAGE_ACCESSION_CEJ
+	  )
+	) {
+	  return COMPETITION_TYPES.BAC;
+  }
+
+  if (
+    label.startsWith(
+      CALENDAR_LABELS.CEJ
+    )
+  ) {
+    return COMPETITION_TYPES.CEJ;
+  }
+
+  if (
+    label.startsWith(
+      CALENDAR_LABELS.TIJ
+    )
+  ) {
+    return COMPETITION_TYPES.TIJ;
+  }
+
+  if (
+    label.startsWith(
+      CALENDAR_LABELS.TRJ
+    )
+  ) {
+    return COMPETITION_TYPES.TRJ;
+  }
+
+  if (
+    label.startsWith(
+      CALENDAR_LABELS.BRASSAGE_NATIONAL
+    )
+  ) {
+    return COMPETITION_TYPES.BNP;
+  }
+  
+  if (
+	  label.startsWith(CALENDAR_LABELS.QUALIFICATION_FRANCE)
+	) {
+	  return CALENDAR_COMPETITION_TYPES.QUALIFICATION_FRANCE_JEUNES;
+	}
+
+	if (
+	  label.startsWith(CALENDAR_LABELS.CHAMPIONNATS_FRANCE)
+	) {
+	  return CALENDAR_COMPETITION_TYPES.CHAMPIONNATS_FRANCE_JEUNES;
+	}
+	
+	if (
+	  label.startsWith(CALENDAR_LABELS.CHAMPIONNAT_BRETAGNE)
+	) {
+	  return CALENDAR_COMPETITION_TYPES.CHAMPIONNAT_BRETAGNE_JEUNES;
+	}
+	
+	if (
+	  label.startsWith(CALENDAR_LABELS.CHAMPIONNATS_DEPARTEMENTAUX)
+	) {
+	  return CALENDAR_COMPETITION_TYPES.CHAMPIONNATS_DEPARTEMENTAUX_JEUNES;
+	}
+	
+	if (
+	  label.startsWith(CALENDAR_LABELS.FINALE_REGIONALE_INTERCLUBS)
+	) {
+	  return CALENDAR_COMPETITION_TYPES.INTERCLUB_REGIONAL;
+	}
+
+  if (label.startsWith('CDJ')) {
+    return COMPETITION_TYPES.CDJ;
+  }
+
+  if (label.startsWith('TDJ')) {
+    return COMPETITION_TYPES.TDJ;
+  }
+
+  return null;
+}
