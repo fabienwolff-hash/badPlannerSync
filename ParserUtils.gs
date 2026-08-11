@@ -16,10 +16,15 @@ function buildNormalizedLabel(cell) {
   return extractLines(cell).join(' ');
 }
 
-function isIlleEtVilainePromobad(
-  department
+function isIlleEtVilaineYouthCompetition(
+  parsed
 ) {
-  return department === '35';
+
+  if (parsed.department) {
+    return parsed.department === '35';
+  }
+
+  return true;
 }
 
 function isYouthPromobad(

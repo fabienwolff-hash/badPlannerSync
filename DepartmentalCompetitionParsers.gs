@@ -48,29 +48,54 @@ function parseYouthCompetitions(calendar) {
 
         case COMPETITION_TYPES.CDJ:
 
-          competitions.push(
-            parseCDJ(
-              cell,
-              row,
-              currentMonth,
-              mergedInfo
-            )
-          );
+		const competitionCdj =
+		  parseCDJ(
+			cell,
+			row,
+			currentMonth,
+			mergedInfo
+		  );
 
-          break;
+		if (!competitionCdj) {
+
+		  Logger.log(
+			`CDJ ignoré : ${cell}`
+		  );
+
+		  break;
+		}
+
+		competitions.push(
+		  competitionCdj
+		);         
+
+        break;
 
         case COMPETITION_TYPES.TDJ:
 
-          competitions.push(
-            parseTDJ(
-              cell,
-              row,
-              currentMonth,
-              mergedInfo
-            )
-          );
 
-          break;
+		const competitionTdj =
+		  parseTDJ(
+			cell,
+			row,
+			currentMonth,
+			mergedInfo
+		  );
+
+		if (!competitionTdj) {
+
+		  Logger.log(
+			`TDJ ignoré : ${cell}`
+		  );
+
+		  break;
+		}
+
+		competitions.push(
+		  competitionTdj
+		);  
+
+        break;
       }
 
     }
@@ -145,8 +170,8 @@ function parsePromobadCompetitions(calendar) {
     }
 
     if (
-      !isIlleEtVilainePromobad(
-        locationInfo.department
+      !isIlleEtVilaineYouthCompetition(
+        locationInfo
       )
     ) {
       return;
@@ -256,6 +281,39 @@ function parseTDJLabel(label) {
     };
   }
 
+  // TDJ Parthenay de Bretagne - S - R5 à NC
+  // TDJ Vitré (35) - S - R4 à NC
+  match = normalized.match(
+    /^TDJ\s+(.+?)\s*-\s*(.+?)\s*-\s*(.+)$/
+  );
+
+  if (match) {
+    return {
+      department: null,
+      city: match[1].trim(),
+      disciplines: match[2].trim(),
+      categoryOrRanking: match[3].trim()
+    };
+  }
+
+  // TDJ 56 - Kervignac - MBad à Jun
+  match = normalized.match(
+    /^TDJ\s+(\d+)\s*-\s*(.+?)\s*-\s*(.+)$/
+  );
+
+  if (match) {
+    return {
+      department: match[1],
+      city: match[2].trim(),
+      disciplines: null,
+      categoryOrRanking: match[3].trim()
+    };
+  }
+
+  Logger.log(
+    `Format TDJ inconnu : ${label}`
+  );
+
   return null;
 }
 
@@ -277,6 +335,14 @@ function parseCDJ(
 	  const parsed = parseCDJLabel(cell);
 
 	if (!parsed) {
+	  return null;
+	}
+	
+	if (
+	  !isIlleEtVilaineYouthCompetition(
+		parsed
+	  )
+	) {
 	  return null;
 	}
 
@@ -318,7 +384,15 @@ function parseTDJ(
 	if (!parsed) {
 	  return null;
 	}
-
+	
+	if (
+	  !isIlleEtVilaineYouthCompetition(
+		parsed
+	  )
+	) {
+	  return null;
+	}
+	
   return createCompetition({
     source: SOURCES.LIGUE_BRETAGNE,
     type: COMPETITION_TYPES.TDJ,
