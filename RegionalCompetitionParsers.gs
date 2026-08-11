@@ -140,6 +140,7 @@ function parseDetailedTRJ(
 }
 
 function parseTIJ(
+  source,
   cell,
   row,
   data,
@@ -167,7 +168,7 @@ function parseTIJ(
   return [
 
     createCompetition({
-      source: SOURCES.LIGUE_BRETAGNE,
+      source,
       type: COMPETITION_TYPES.TIJ,
       label: cell.trim(),
       startDate,
@@ -177,7 +178,7 @@ function parseTIJ(
     }),
 
     createCompetition({
-      source: SOURCES.LIGUE_BRETAGNE,
+      source,
       type: COMPETITION_TYPES.TIJ,
       label: cell.trim(),
       startDate: addDays(startDate, 1),

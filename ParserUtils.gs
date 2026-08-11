@@ -82,9 +82,19 @@ function extractCategoriesFromAgeRange(
   value
 ) {
 
+if (value.includes('/')) {
+
+  return value
+    .split('/')
+    .map(v => v.trim())
+    .map(v => CATEGORY_LABEL_MAPPING[v])
+    .filter(Boolean);
+
+}	
+
   const match =
     value.match(
-      /(MBad|Pou|Ben|Min|Cad|Jun)\s+à\s+(MBad|Pou|Ben|Min|Cad|Jun)/i
+      /(MBad|Minibad|Pou|Poussin|Ben|Benjamin|Min|Minime|Cad|Cadet|Jun|Junior)\s+à\s+(MBad|Minibad|Pou|Poussin|Ben|Benjamin|Min|Minime|Cad|Cadet|Jun|Junior)/i
     );
 
   if (!match) {

@@ -28,7 +28,9 @@ const COMMITTEE35_CALENDAR_CONFIG = {
 // =================================================
 
 const SHEETS = {
-  SNAPSHOT_CURRENT: "SNAPSHOT_CURRENT",
+  SNAPSHOT_LIGUE: 'SNAPSHOT_LIGUE',
+  SNAPSHOT_COMITE_35: 'SNAPSHOT_COMITE_35',
+
   SNAPSHOT_PREVIOUS: "SNAPSHOT_PREVIOUS",
   PENDING_CHANGES: "PENDING_CHANGES",
   CONFIG: "CONFIG"
@@ -220,9 +222,15 @@ const CATEGORY_ORDER = [
 
 const CATEGORY_LABEL_MAPPING = {
   MBad: 'Minibad',
+  Minibad: 'Minibad',
   Pou: 'Poussin',
+  Poussin: 'Poussin',
   Ben: 'Benjamin',
+  Benjamin: 'Benjamin',
   Min: 'Minime',
+  Minime: 'Minime',
   Cad: 'Cadet',
-  Jun: 'Junior'
+  Cadet: 'Cadet',
+  Jun: 'Junior',
+  Junior: 'Junior'
 };

@@ -1,8 +1,24 @@
-function writeSnapshot(competitions) {
-  const sheet = SpreadsheetApp.getActive()
-    .getSheetByName(
-      SHEETS.SNAPSHOT_CURRENT
-    );
+function generateCommittee35Snapshot() {
+
+  const calendar = loadCommittee35Calendar();
+  const competitions = parseCommittee35Competitions(calendar);
+
+  writeSnapshot(SHEETS.SNAPSHOT_COMITE_35,competitions);
+}
+
+function generateLeagueSnapshot() {
+
+  const calendar = loadLeagueCalendar();
+  const competitions = parseLeagueCompetitions(calendar);
+
+  writeSnapshot(SHEETS.SNAPSHOT_LIGUE,competitions);
+}
+
+function writeSnapshot(
+sheetName,
+competitions
+) {
+  const sheet = SpreadsheetApp.getActive().getSheetByName(sheetName);
 
   sheet.clearContents();
 

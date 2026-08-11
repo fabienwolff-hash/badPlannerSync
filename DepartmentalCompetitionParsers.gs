@@ -204,6 +204,26 @@ function parseCDJLabel(label) {
   };
 }
 
+function parseCommitteeCDJLabel(
+  label
+) {
+
+  const match =
+    label.match(
+      /^CDJ\s+n°(\d+)\s+(.+?)\s+\((.+)\)$/i
+    );
+
+  if (!match) {
+    return null;
+  }
+
+  return {
+    number: Number(match[1]),
+    discipline: match[2].trim(),
+    location: match[3].trim()
+  };
+}
+
 function parseTDJLabel(label) {
 
   const normalized = label
@@ -332,4 +352,59 @@ function resolveYouthCategories(
   return extractCategoriesFromAgeRange(
     cell
   );
+}
+
+function extractCommitteeLocation(
+  value
+) {
+
+  const match =
+    value.match(
+      /\(Lieu\s*:\s*([^)]+)\)/i
+    );
+
+  if (match) {
+    return match[1].trim();
+  }
+
+  return value.trim();
+}
+
+function isMultiDisciplineTdj(
+  discipline,
+  categoriesLabel
+) {
+
+  return (
+    discipline.includes('S D') &&
+    categoriesLabel.includes(':')
+  );
+
+}
+
+function parseMultiDisciplineTdj(
+  categoriesLabel
+) {
+
+  return categoriesLabel
+    .split('\n')
+    .map(line => line.trim())
+    .filter(Boolean)
+    .map(line => {
+
+      const [
+        discipline,
+        categoryRange
+      ] = line.split(':');
+
+      return {
+        discipline: discipline.trim(),
+        categories:
+          extractCategoriesFromAgeRange(
+            categoryRange.trim()
+          )
+      };
+
+    });
+
 }

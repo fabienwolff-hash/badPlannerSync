@@ -1,29 +1,18 @@
 function main() {
+  generateLeagueSnapshot();
+  generateCommittee35Snapshot();
+}
 
-  const calendar =
-    loadLeagueCalendar();
+function inspectCommitteeCalendar() {
 
-  const competitions = [
+  const committeeCalendar =
+  loadCommittee35Calendar();
 
-    ...parseNationalCompetitions(
-      calendar
-    ),
-
-    ...parseRegionalCompetitions(
-      calendar
-    ),
-	
-	...parsePromobadCompetitions(
-	  calendar
-	),
-
-	...parseYouthCompetitions(
-	  calendar
-	)
-
-  ];
-
-  writeSnapshot(
-    competitions
-  );
+Logger.log(
+  JSON.stringify(
+    parseCommitteeTdjCompetitions(
+      committeeCalendar
+    )
+  )
+);
 }

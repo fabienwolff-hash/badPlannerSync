@@ -1,3 +1,15 @@
+function parseLeagueCompetitions(
+  calendar
+) {
+
+  return [
+    ...parseNationalCompetitions(calendar),
+    ...parseRegionalCompetitions(calendar),
+    ...parsePromobadCompetitions(calendar),
+    ...parseYouthCompetitions(calendar)
+  ];
+}
+
 function parseNationalCompetitions(calendar) {
 
   const competitions = [];
@@ -192,6 +204,7 @@ function parseRegionalCompetitions(calendar) {
 
 		competitions.push(
 		  ...parseTIJ(
+			SOURCES.LIGUE_BRETAGNE,
 			cell,
 			row,
 			data,
