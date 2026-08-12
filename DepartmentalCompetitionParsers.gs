@@ -1,110 +1,3 @@
-function parseYouthCompetitions(calendar) {
-
-  const competitions = [];
-
-  const data = calendar.values;
-
-  const mergedIndex = buildMergedRangesIndex(
-    calendar.mergedRanges
-  );
-
-  let currentMonth = null;
-
-  data.forEach((row, index) => {
-
-    const sheetRow = index + 1;
-
-    if (row[LIGUE_CALENDAR_COLUMNS.MONTH]) {
-      currentMonth =
-        row[LIGUE_CALENDAR_COLUMNS.MONTH];
-    }
-
-    for (
-      let column = LIGUE_CALENDAR_COLUMNS.MINIBAD;
-      column <= LIGUE_CALENDAR_COLUMNS.JUNIOR;
-      column++
-    ) {
-
-      const cell = row[column];
-
-      if (!cell) {
-        continue;
-      }
-
-		const mergedInfo =
-		  findYouthMergedInfo(
-			mergedIndex,
-			sheetRow
-		  );
-
-      const competitionType =
-        getCompetitionType(cell);
-
-      if (!competitionType) {
-        continue;
-      }
-
-      switch (competitionType) {
-
-        case COMPETITION_TYPES.CDJ:
-
-		const competitionCdj =
-		  parseCDJ(
-			cell,
-			row,
-			currentMonth,
-			mergedInfo
-		  );
-
-		if (!competitionCdj) {
-
-		  Logger.log(
-			`CDJ ignoré : ${cell}`
-		  );
-
-		  break;
-		}
-
-		competitions.push(
-		  competitionCdj
-		);         
-
-        break;
-
-        case COMPETITION_TYPES.TDJ:
-
-
-		const competitionTdj =
-		  parseTDJ(
-			cell,
-			row,
-			currentMonth,
-			mergedInfo
-		  );
-
-		if (!competitionTdj) {
-
-		  Logger.log(
-			`TDJ ignoré : ${cell}`
-		  );
-
-		  break;
-		}
-
-		competitions.push(
-		  competitionTdj
-		);  
-
-        break;
-      }
-
-    }
-
-  });
-
-  return competitions;
-}
-
 function parseChampionnatsDepartementauxJeunes(
   cell,
   row,
@@ -138,95 +31,40 @@ function parseChampionnatsDepartementauxJeunes(
   });
 }
 
-function parsePromobadCompetitions(calendar) {
-
-  const competitions = [];
-
-  const data = calendar.values;
-
-  let currentMonth = null;
-
-  data.forEach((row) => {
-
-    if (row[LIGUE_CALENDAR_COLUMNS.MONTH]) {
-      currentMonth =
-        row[LIGUE_CALENDAR_COLUMNS.MONTH];
-    }
-
-    const locationCell =
-      row[LIGUE_CALENDAR_COLUMNS.PROMOBAD_LOCATION];
-
-    const tableauCell =
-      row[LIGUE_CALENDAR_COLUMNS.PROMOBAD_TABLEAU];
-
-    if (!locationCell || !tableauCell) {
-      return;
-    }
-
-    const locationInfo = extractCityAndDepartment(locationCell);
-
-    if (!locationInfo) {
-      return;
-    }
-
-    if (
-      !isIlleEtVilaineYouthCompetition(
-        locationInfo
-      )
-    ) {
-      return;
-    }
-
-    if (
-      !isYouthPromobad(tableauCell)
-    ) {
-      return;
-    }
-
-    const startDate = buildDate(
-      SEASON_YEAR,
-      currentMonth,
-      Number(
-        row[LIGUE_CALENDAR_COLUMNS.DATE]
-      )
-    );
-
-    competitions.push(
-      createCompetition({
-        source: SOURCES.LIGUE_BRETAGNE,
-        type: COMPETITION_TYPES.PROMOBAD,
-        label: tableauCell,
-        startDate,
-        endDate: startDate,
-        city: locationInfo.city,
-		department: locationInfo.department,
-
-        rawData:
-          `${locationCell} | ${tableauCell}`
-      })
-    );
-
-  });
-
-  return competitions;
-}
-
 function parseCDJLabel(label) {
 
-  const match = label.match(
+  let match = label.match(
     /^CDJ\s+(\d+)\s*-\s*(.+?)\s*-\s*(.+?)\s*-\s*(.+)$/
   );
 
-  if (!match) {
-    return null;
+  if (match) {
+    return {
+      department: match[1],
+      city: match[2].trim(),
+      disciplines: match[3].trim(),
+      rankingRange: match[4].trim()
+    };
   }
 
-  return {
-    department: match[1],
-    city: match[2].trim(),
-    disciplines: match[3].trim(),
-    rankingRange: match[4].trim()
-  };
+  match = label.match(
+    /^CDJ\s+(\d+)\s+(.+?)\s*-\s*(.+?)\s*-\s*(.+)$/
+  );
+
+  if (match) {
+    return {
+      department: match[1],
+      city: match[2].trim(),
+      disciplines: match[3].trim(),
+      rankingRange: match[4].trim()
+    };
+  }
+
+  Logger.log(
+    `Format CDJ inconnu : ${label}`
+  );
+
+  return null;
+
 }
 
 function parseCommitteeCDJLabel(
@@ -255,20 +93,10 @@ function parseTDJLabel(label) {
     .replace(/\s+/g, ' ')
     .trim();
 
+  //
+  // TDJ 35 Etrelles - S - R4 à NC
+  //
   let match = normalized.match(
-    /^TDJ\s+(\d+)\s*-\s*(.+?)\s*-\s*(.+?)\s*-\s*(.+)$/
-  );
-
-  if (match) {
-    return {
-      department: match[1],
-      city: match[2].trim(),
-      disciplines: match[3].trim(),
-      categoryOrRanking: match[4].trim()
-    };
-  }
-
-  match = normalized.match(
     /^TDJ\s+(\d+)\s+(.+?)\s*-\s*(.+?)\s*-\s*(.+)$/
   );
 
@@ -281,22 +109,25 @@ function parseTDJLabel(label) {
     };
   }
 
-  // TDJ Parthenay de Bretagne - S - R5 à NC
-  // TDJ Vitré (35) - S - R4 à NC
+  //
+  // TDJ 35 - Etrelles - S - R4 à NC
+  //
   match = normalized.match(
-    /^TDJ\s+(.+?)\s*-\s*(.+?)\s*-\s*(.+)$/
+    /^TDJ\s+(\d+)\s*-\s*(.+?)\s*-\s*(.+?)\s*-\s*(.+)$/
   );
 
   if (match) {
     return {
-      department: null,
-      city: match[1].trim(),
-      disciplines: match[2].trim(),
-      categoryOrRanking: match[3].trim()
+      department: match[1],
+      city: match[2].trim(),
+      disciplines: match[3].trim(),
+      categoryOrRanking: match[4].trim()
     };
   }
 
+  //
   // TDJ 56 - Kervignac - MBad à Jun
+  //
   match = normalized.match(
     /^TDJ\s+(\d+)\s*-\s*(.+?)\s*-\s*(.+)$/
   );
@@ -310,11 +141,29 @@ function parseTDJLabel(label) {
     };
   }
 
+  //
+  // TDJ Parthenay de Bretagne - S - R5 à NC
+  // TDJ Vitré (35) - S - R4 à NC
+  //
+  match = normalized.match(
+    /^TDJ\s+(.+?)\s*-\s*(.+?)\s*-\s*(.+)$/
+  );
+
+  if (match) {
+    return {
+      department: null,
+      city: match[1].trim(),
+      disciplines: match[2].trim(),
+      categoryOrRanking: match[3].trim()
+    };
+  }
+
   Logger.log(
     `Format TDJ inconnu : ${label}`
   );
 
   return null;
+
 }
 
 function parseCDJ(
@@ -332,9 +181,14 @@ function parseCDJ(
     Number(row[LIGUE_CALENDAR_COLUMNS.DATE])
   );
   
-	  const parsed = parseCDJLabel(cell);
+const parsed = parseCDJLabel(cell);
 
 	if (!parsed) {
+
+	  Logger.log(
+		`CDJ non parsé : ${cell}`
+	  );
+
 	  return null;
 	}
 	
@@ -343,6 +197,10 @@ function parseCDJ(
 		parsed
 	  )
 	) {
+	  Logger.log(
+		`CDJ non 35 : ${cell}`
+	  );
+
 	  return null;
 	}
 
@@ -390,6 +248,10 @@ function parseTDJ(
 		parsed
 	  )
 	) {
+	  Logger.log(
+		`CDJ non 35 : ${cell}`
+	  );
+
 	  return null;
 	}
 	

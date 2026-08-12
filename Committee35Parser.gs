@@ -65,8 +65,7 @@ function parseCommitteeNationalCompetitions(
       return;
     }
 
-    const normalizedLabel =
-      buildNormalizedLabel(cell);
+    const normalizedLabel = normalizeCompetitionLabel(cell);
 
     const competitionType =
       getCompetitionType(
@@ -240,8 +239,7 @@ function parseCommitteeRegionalCompetitions(
       return;
     }
 
-    const normalizedLabel =
-      buildNormalizedLabel(cell);
+	const normalizedLabel = normalizeCompetitionLabel(cell);
 
     const competitionType =
       getCompetitionType(
@@ -312,6 +310,28 @@ function parseCommitteeRegionalCompetitions(
 	  );
 
 	  break;
+
+	case CALENDAR_COMPETITION_TYPES.CHAMPIONNATS_DEPARTEMENTAUX_JEUNES:
+
+        competitions.push(
+          createCompetition({
+            source: SOURCES.COMITE_35,
+
+            type: COMPETITION_TYPES.CHAMPIONNAT,
+
+            scope: SCOPES.DEPARTEMENTALE,
+
+            label:
+              'Championnats Départementaux Jeunes',
+
+            startDate,
+            endDate,
+
+            rawData: cell
+          })
+        );
+
+        break;
 
       case CALENDAR_COMPETITION_TYPES.CHAMPIONNAT_BRETAGNE_JEUNES:
 
@@ -400,15 +420,9 @@ function parseCommitteeDepartmentalCompetitions(
       return;
     }
 
-	const normalizedLabel =
-	  normalizeCommitteeCDJLabel(
-		buildNormalizedLabel(cell)
-	  );
+	const normalizedLabel = normalizeCommitteeCDJLabel(normalizeCompetitionLabel(cell));
 	  
-	const parsed =
-	  parseCommitteeCDJLabel(
-		normalizedLabel
-	  );
+	const parsed = parseCommitteeCDJLabel(normalizedLabel);
 
 	if (!parsed) {
 	  return;

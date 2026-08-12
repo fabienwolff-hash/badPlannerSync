@@ -245,3 +245,73 @@ function getCompetitionType(label) {
 
   return null;
 }
+
+function loadNormalizationRules() {
+
+  const sheet =
+    SpreadsheetApp.getActive()
+      .getSheetByName(
+        SHEETS.NORMALIZATION_RULES
+      );
+
+  return sheet
+    .getDataRange()
+    .getValues()
+    .slice(1)
+    .map(row => ({
+      type: row[0],
+      pattern: row[1],
+      replacement: row[2]
+    }));
+
+}
+
+let normalizationRulesCache = null;
+
+function getNormalizationRules() {
+
+  if (!normalizationRulesCache) {
+
+    normalizationRulesCache =
+      loadNormalizationRules();
+
+  }
+
+  return normalizationRulesCache;
+
+}
+
+function normalizeValue(
+  value,
+  type
+) {
+
+  const rules = getNormalizationRules();
+  let normalized = value;
+
+  rules.forEach(
+    rule => {
+
+      normalized =
+        normalized.replaceAll(
+          rule.pattern,
+          rule.replacement
+        );
+
+    }
+  );
+
+  return normalized;
+
+}
+
+function normalizeCompetitionLabel(
+  cell
+) {
+
+  return normalizeValue(
+    buildNormalizedLabel(cell),
+    'LABEL'
+  );
+
+}

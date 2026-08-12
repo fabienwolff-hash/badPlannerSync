@@ -38,7 +38,7 @@ function parseNationalCompetitions(calendar) {
       return;
     }
 	
-	const normalizedLabel = buildNormalizedLabel(cell);
+	const normalizedLabel = normalizeCompetitionLabel(cell);
 
 	const competitionType =
 	  getCompetitionType(normalizedLabel);
@@ -166,7 +166,7 @@ function parseRegionalCompetitions(calendar) {
       return;
     }
  
-	const normalizedLabel = buildNormalizedLabel(cell);
+	const normalizedLabel = normalizeCompetitionLabel(cell);
 	
     const competitionType =
       getCompetitionType(normalizedLabel);
@@ -261,6 +261,190 @@ function parseRegionalCompetitions(calendar) {
 
 		  break;
 	}
+
+  });
+
+  return competitions;
+}
+
+function parsePromobadCompetitions(calendar) {
+
+  const competitions = [];
+
+  const data = calendar.values;
+
+  let currentMonth = null;
+
+  data.forEach((row) => {
+
+    if (row[LIGUE_CALENDAR_COLUMNS.MONTH]) {
+      currentMonth =
+        row[LIGUE_CALENDAR_COLUMNS.MONTH];
+    }
+
+	const locationCell =
+	  normalizeCompetitionLabel(
+		row[LIGUE_CALENDAR_COLUMNS.PROMOBAD_LOCATION]
+	  );
+
+	const tableauCell =
+	  normalizeCompetitionLabel(
+		row[LIGUE_CALENDAR_COLUMNS.PROMOBAD_TABLEAU]
+	  );
+
+    if (!locationCell || !tableauCell) {
+      return;
+    }
+
+    const locationInfo = extractCityAndDepartment(locationCell);
+
+    if (!locationInfo) {
+      return;
+    }
+
+    if (
+      !isIlleEtVilaineYouthCompetition(
+        locationInfo
+      )
+    ) {
+      return;
+    }
+
+    if (
+      !isYouthPromobad(tableauCell)
+    ) {
+      return;
+    }
+
+    const startDate = buildDate(
+      SEASON_YEAR,
+      currentMonth,
+      Number(
+        row[LIGUE_CALENDAR_COLUMNS.DATE]
+      )
+    );
+
+    competitions.push(
+      createCompetition({
+        source: SOURCES.LIGUE_BRETAGNE,
+        type: COMPETITION_TYPES.PROMOBAD,
+        label: tableauCell,
+        startDate,
+        endDate: startDate,
+        city: locationInfo.city,
+		department: locationInfo.department,
+
+        rawData:
+          `${locationCell} | ${tableauCell}`
+      })
+    );
+
+  });
+
+  return competitions;
+}
+
+function parseYouthCompetitions(calendar) {
+
+  const competitions = [];
+
+  const data = calendar.values;
+
+  const mergedIndex = buildMergedRangesIndex(
+    calendar.mergedRanges
+  );
+
+  let currentMonth = null;
+
+  data.forEach((row, index) => {
+
+    const sheetRow = index + 1;
+
+    if (row[LIGUE_CALENDAR_COLUMNS.MONTH]) {
+      currentMonth =
+        row[LIGUE_CALENDAR_COLUMNS.MONTH];
+    }
+
+    for (
+      let column = LIGUE_CALENDAR_COLUMNS.MINIBAD;
+      column <= LIGUE_CALENDAR_COLUMNS.JUNIOR;
+      column++
+    ) {
+		
+	  const cell = row[column];	
+	  const normalizedLabel = normalizeCompetitionLabel(row[column]);
+
+      if (!normalizedLabel) {
+        continue;
+      }
+
+		const mergedInfo =
+		  findYouthMergedInfo(
+			mergedIndex,
+			sheetRow
+		  );
+
+      const competitionType = getCompetitionType(normalizedLabel);
+
+      if (!competitionType) {
+        continue;
+      }
+
+      switch (competitionType) {
+
+        case COMPETITION_TYPES.CDJ:
+
+		const competitionCdj =
+		  parseCDJ(
+			normalizedLabel,
+			row,
+			currentMonth,
+			mergedInfo
+		  );
+
+		if (!competitionCdj) {
+
+		  Logger.log(
+			`CDJ ignoré : ${normalizedLabel}`
+		  );
+
+		  break;
+		}
+
+		competitions.push(
+		  competitionCdj
+		);         
+
+        break;
+
+        case COMPETITION_TYPES.TDJ:
+
+
+		const competitionTdj =
+		  parseTDJ(
+			normalizedLabel,
+			row,
+			currentMonth,
+			mergedInfo
+		  );
+
+		if (!competitionTdj) {
+
+		  Logger.log(
+			`TDJ ignoré : ${normalizedLabel}`
+		  );
+
+		  break;
+		}
+
+		competitions.push(
+		  competitionTdj
+		);  
+
+        break;
+      }
+
+    }
 
   });
 

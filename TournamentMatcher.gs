@@ -241,6 +241,8 @@ function writeTournamentMatches(
     'TournamentId',
     'Type',
     'Status',
+	'SuggestedMatch',
+	'Score',
 
     'DateMatch',
     'CityMatch',
@@ -277,7 +279,12 @@ function writeTournamentMatches(
 
       match.type,
 
-      match.status,
+
+	  match.status,
+
+		match.suggestedMatch || '',
+
+		match.score || '',
 
       match.dateMatch ?? '',
 
@@ -328,27 +335,34 @@ function analyzeTournamentMatches() {
   const competitions =
     readSnapshotCompetitions();
 
-  const matches =
+  let matches =
     buildTournamentMatches(
       competitions
+    );
+
+  const overrides =
+    loadMatchOverrides();
+
+  matches =
+    applyOverrides(
+      matches,
+      overrides
+    );
+
+  const potentialMatches =
+    findPotentialMatches(
+      matches
+    );
+
+  matches =
+    enrichMatchesWithCandidates(
+      matches,
+      potentialMatches
     );
 
   writeTournamentMatches(
     matches
   );
-
-const potentialMatches =
-  findPotentialMatches(
-    matches
-  );
-
-Logger.log(
-  JSON.stringify(
-    potentialMatches,
-    null,
-    2
-  )
-);
 
 }
 
@@ -461,7 +475,7 @@ function findPotentialMatches(
         MATCH_STATUS.COMITE_ONLY
     );
 
-  const candidates = [];
+  const candidates = {};
 
   ligueOnly.forEach(
     ligueMatch => {
@@ -476,12 +490,21 @@ function findPotentialMatches(
             return;
           }
 
-          candidates.push(
+          const candidate =
             buildPotentialMatch(
               ligueMatch,
               comiteMatch
-            )
-          );
+            );
+
+          if (
+            candidate.score >= 50
+          ) {
+
+            candidates[
+              ligueMatch.tournamentId
+            ] = candidate;
+
+          }
 
         }
       );
@@ -489,10 +512,7 @@ function findPotentialMatches(
     }
   );
 
-  return candidates.filter(
-    candidate =>
-      candidate.score >= 50
-  );
+  return candidates;
 
 }
 
@@ -580,5 +600,177 @@ function calculateMatchScore(
   }
 
   return score;
+
+}
+
+function loadMatchOverrides() {
+
+  const sheet =
+    SpreadsheetApp.getActive()
+      .getSheetByName(
+        SHEETS.TOURNAMENT_MATCH_OVERRIDES
+      );
+
+  if (!sheet) {
+    return [];
+  }
+
+  return sheet
+    .getDataRange()
+    .getValues()
+    .slice(1)
+    .map(row => ({
+      ligueTournamentId: row[0],
+      comiteTournamentId: row[1]
+    }))
+    .filter(
+      override =>
+        override.ligueTournamentId &&
+        override.comiteTournamentId
+    );
+
+}
+
+function findOverride(
+  ligueTournamentId,
+  comiteTournamentId,
+  overrides
+) {
+
+  return overrides.find(
+    override =>
+      override.ligueTournamentId ===
+        ligueTournamentId
+      &&
+      override.comiteTournamentId ===
+        comiteTournamentId
+  );
+
+}
+
+function applyOverrides(
+  matches,
+  overrides
+) {
+
+  const processedIds =
+    new Set();
+
+  const result = [];
+
+  overrides.forEach(
+    override => {
+
+      const ligueMatch =
+        matches.find(
+          match =>
+            match.tournamentId ===
+            override.ligueTournamentId
+        );
+
+      const comiteMatch =
+        matches.find(
+          match =>
+            match.tournamentId ===
+            override.comiteTournamentId
+        );
+
+      if (
+        !ligueMatch ||
+        !comiteMatch
+      ) {
+        return;
+      }
+
+      result.push({
+
+        tournamentId:
+          ligueMatch.tournamentId,
+
+        type:
+          ligueMatch.type,
+
+        status:
+          MATCH_STATUS.MATCH_OVERRIDE,
+
+        ligue:
+          ligueMatch.ligue,
+
+        comite:
+          comiteMatch.comite,
+
+        suggestedMatch:
+          override.comiteTournamentId,
+
+        score: 100
+
+      });
+
+      processedIds.add(
+        override.ligueTournamentId
+      );
+
+      processedIds.add(
+        override.comiteTournamentId
+      );
+
+    }
+  );
+
+  matches.forEach(
+    match => {
+
+      if (
+        processedIds.has(
+          match.tournamentId
+        )
+      ) {
+        return;
+      }
+
+      result.push(match);
+
+    }
+  );
+
+  return result;
+
+}
+
+
+function enrichMatchesWithCandidates(
+  matches,
+  potentialMatches
+) {
+
+  return matches.map(
+    match => {
+
+      const candidate =
+        potentialMatches[
+          match.tournamentId
+        ];
+
+      if (!candidate) {
+        return match;
+      }
+
+      return {
+
+        ...match,
+
+        status:
+          MATCH_STATUS.POTENTIAL_MATCH,
+
+        suggestedMatch:
+          candidate.comiteTournamentId,
+
+        score:
+          candidate.score
+
+      };
+
+    }
+  );
 
 }
