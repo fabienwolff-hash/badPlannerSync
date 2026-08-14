@@ -92,6 +92,47 @@ function parseDetailedTRJ(
   currentMonth
 );
 
+if (
+  lines.length === 3 &&
+  lines[1].startsWith('(') &&
+  lines[1].endsWith(')')
+) {
+
+  const categories =
+    lines[1]
+      .replace(/[()]/g, '')
+      .split('-')
+      .map(cat => cat.trim());
+
+  const city =
+    lines[2].trim();
+
+  competitions.push(
+    createCompetition({
+      source:
+        SOURCES.LIGUE_BRETAGNE,
+
+      type:
+        COMPETITION_TYPES.TRJ,
+
+      label,
+
+      startDate,
+      endDate,
+
+      city,
+
+      categories,
+
+      rawData:
+        lines.slice(1).join(' ')
+    })
+  );
+
+  return competitions;
+}
+
+
   for (let i = 1; i < lines.length; i++) {
 
     const siteLine = lines[i];
@@ -214,7 +255,7 @@ function parseChampionnatBretagneJeunes(
     source: SOURCES.LIGUE_BRETAGNE,
     type: COMPETITION_TYPES.CHAMPIONNAT,
     scope: SCOPES.REGIONALE,
-    label: "Championnat de Bretagne Jeunes",
+    label: "Championnat Régional",
 
     startDate,
     endDate,

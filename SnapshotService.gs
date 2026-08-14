@@ -27,6 +27,7 @@ competitions
     'Source',
     'Type',
     'Scope',
+	'Title',
     'Label',
     'StartDate',
     'EndDate',
@@ -34,6 +35,7 @@ competitions
     'Department',
     'City',
     'Categories',
+	'Disciplines',
     'RawData'
   ];
 
@@ -62,6 +64,7 @@ competitions
       competition.source || '',
       competition.type || '',
       competition.scope || '',
+      competition.title || '',
       competition.label || '',
       competition.startDate || '',
       competition.endDate || '',
@@ -70,6 +73,9 @@ competitions
       competition.city || '',
       competition.categories
         ? competition.categories.join(';')
+        : '',
+	  competition.disciplines
+        ? competition.disciplines.join(';')
         : '',
       competition.rawData || ''
     ]

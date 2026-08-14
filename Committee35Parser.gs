@@ -162,7 +162,7 @@ function parseCommitteeNationalCompetitions(
             scope: SCOPES.NATIONALE,
 
             label:
-              'Qualification France Jeunes',
+              'Championnat France - Qualification',
 
             startDate,
             endDate,
@@ -184,7 +184,7 @@ function parseCommitteeNationalCompetitions(
             scope: SCOPES.NATIONALE,
 
             label:
-              'Championnats de France Jeunes',
+              'Championnat France - Phase finale',
 
             startDate,
             endDate,
@@ -322,7 +322,7 @@ function parseCommitteeRegionalCompetitions(
             scope: SCOPES.DEPARTEMENTALE,
 
             label:
-              'Championnats Départementaux Jeunes',
+              'Championnat Départemental',
 
             startDate,
             endDate,
@@ -344,7 +344,7 @@ function parseCommitteeRegionalCompetitions(
             scope: SCOPES.REGIONALE,
 
             label:
-              'Championnat de Bretagne Jeunes',
+              'Championnat Régional',
 
             startDate,
             endDate,
@@ -425,7 +425,7 @@ function parseCommitteeDepartmentalCompetitions(
 	const parsed = parseCommitteeCDJLabel(normalizedLabel);
 
 	if (!parsed) {
-	  return;
+	  return rejectCompetition(SOURCES.COMITE_35,cell);
 	}
 
     //

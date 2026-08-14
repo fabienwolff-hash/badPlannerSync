@@ -36,33 +36,47 @@ function readSheetCompetitions(
     return [];
   }
 
-  return values
-    .slice(1)
-    .map(row => ({
+return values
+  .slice(1)
+  .map(row => ({
 
-      tournamentId: row[0],
-      source: row[1],
-      type: row[2],
-      scope: row[3],
-      label: row[4],
-      startDate: row[5],
-      endDate: row[6],
-      region: row[7],
-      department: row[8],
-      city: row[9],
+    tournamentId: row[0],
+    source: row[1],
+    type: row[2],
+    scope: row[3],
 
-		categories:
-		  typeof row[10] === 'string'
-			? row[10]
-				.split(';')
-				.map(c => c.trim())
-				.filter(Boolean)
-			: [],
+    title: row[4],
+    label: row[5],
 
-      rawData: row[11]
+    startDate: row[6],
+    endDate: row[7],
 
-    }));
+    region: row[8],
+	department: row[9] !== ''
+		? String(parseInt(row[9], 10))
+		: '',
+	
+    city: row[10],
 
+    categories:
+      typeof row[11] === 'string'
+        ? row[11]
+            .split(';')
+            .map(c => c.trim())
+            .filter(Boolean)
+        : [],
+
+    disciplines:
+      typeof row[12] === 'string'
+        ? row[12]
+            .split(';')
+            .map(d => d.trim())
+            .filter(Boolean)
+        : [],
+
+    rawData: row[13]
+
+  }));
 }
 
 function groupCompetitionsByTournamentId(
@@ -244,10 +258,6 @@ function writeTournamentMatches(
 	'SuggestedMatch',
 	'Score',
 
-    'DateMatch',
-    'CityMatch',
-    'CategoriesMatch',
-
     'Differences',
 
     'LigueFound',
@@ -256,11 +266,26 @@ function writeTournamentMatches(
     'LigueLabel',
     'ComiteLabel',
 
-    'LigueStartDate',
-    'ComiteStartDate',
+  'LigueStartDate',
+  'LigueEndDate',
 
-    'LigueCity',
-    'ComiteCity'
+  'ComiteStartDate',
+  'ComiteEndDate',
+
+  'LigueCity',
+  'ComiteCity',
+
+  'LigueDepartment',
+  'ComiteDepartment',
+
+  'LigueRegion',
+  'ComiteRegion',
+
+  'LigueScope',
+  'ComiteScope',
+
+  'LigueCategories',
+  'ComiteCategories'
   ];
 
   sheet
@@ -286,12 +311,6 @@ function writeTournamentMatches(
 
 		match.score || '',
 
-      match.dateMatch ?? '',
-
-      match.cityMatch ?? '',
-
-      match.categoriesMatch ?? '',
-
       match.differences
         ? match.differences.join('; ')
         : '',
@@ -306,11 +325,31 @@ function writeTournamentMatches(
 
       match.ligue?.startDate || '',
 
-      match.comite?.startDate || '',
+      match.ligue?.endDate || '',
+
+	  match.comite?.startDate || '',
+	  
+      match.comite?.endDate || '',
 
       match.ligue?.city || '',
 
-      match.comite?.city || ''
+      match.comite?.city || '',
+	  
+	  match.ligue?.department || '',
+
+      match.comite?.department || '',
+	  
+	  match.ligue?.region || '',
+
+      match.comite?.region || '',
+	  
+	  match.ligue?.scope || '',
+
+      match.comite?.scope || '',
+	  
+	 (match.ligue?.categories || []).join(';'),
+
+	 (match.comite?.categories || []).join(';')
 
     ]
   );
@@ -363,7 +402,6 @@ function analyzeTournamentMatches() {
   writeTournamentMatches(
     matches
   );
-
 }
 
 function compareCompetitions(
@@ -414,9 +452,6 @@ const categoriesMatch =
   }
 
   return {
-    dateMatch,
-    cityMatch,
-    categoriesMatch,
     differences
   };
 
@@ -772,5 +807,992 @@ function enrichMatchesWithCandidates(
 
     }
   );
+
+}
+
+function syncTournamentMaster() {
+
+  const sourceSpreadsheet =
+    SpreadsheetApp.openById(
+    BADPLANNER_CONFIG.SPREADSHEET_ID
+  );
+
+  const sourceSheet = sourceSpreadsheet.getSheetByName(
+    BADPLANNER_CONFIG.SHEET_NAME
+  ); 
+  
+  const targetSheet = SpreadsheetApp.getActive().getSheetByName(SHEETS.TOURNAMENT_MASTER);
+  
+  const values =
+    sourceSheet
+      .getDataRange()
+      .getValues();
+
+  targetSheet.clearContents();
+
+  if (values.length > 0) {
+
+    targetSheet
+      .getRange(
+        1,
+        1,
+        values.length,
+        values[0].length
+      )
+      .setValues(values);
+
+  }
+
+}
+
+function buildMasterTournament(
+  competition
+) {
+
+  return {
+
+    tournamentId:
+      competition.tournamentId,
+
+    type:
+      competition.type,
+
+    scope: '',
+
+	title: buildTitle(tournament),
+
+    region: '',
+
+    department:
+      competition.department || '',
+
+    city:
+      competition.city || '',
+
+    gymnasium: '',
+
+    startDate:
+      competition.startDate,
+
+    endDate:
+      competition.endDate,
+
+    categories:
+      (competition.categories || [])
+        .join(';'),
+
+    disciplines: '',
+
+    registrationOpenDate: '',
+
+    registrationCloseDate: '',
+
+    eventUrl: ''
+
+  };
+
+}
+
+function resolveScope(
+  competition
+) {
+
+  switch (competition.type) {
+
+    case COMPETITION_TYPES.TIJ:
+    case COMPETITION_TYPES.BNP:
+    case COMPETITION_TYPES.CEJ:
+    case COMPETITION_TYPES.BAC:
+      return SCOPES.NATIONALE;
+
+    case COMPETITION_TYPES.TRJ:
+      return SCOPES.REGIONALE;
+
+    case COMPETITION_TYPES.TDJ:
+    case COMPETITION_TYPES.CDJ:
+    case COMPETITION_TYPES.PROMOBAD:
+      return SCOPES.DEPARTEMENTALE;
+
+    default:
+      return '';
+
+  }
+
+}
+
+function writeMasterCandidates(
+  candidates
+) {
+
+  const sheet =
+    SpreadsheetApp.getActive()
+      .getSheetByName(
+        SHEETS.TOURNAMENT_MASTER_CANDIDATES
+      );
+
+  sheet.clearContents();
+
+  sheet
+    .getRange(
+      1,
+      1,
+      1,
+      MASTER_TOURNAMENT_HEADERS.length
+    )
+    .setValues([
+      MASTER_TOURNAMENT_HEADERS
+    ]);
+
+  const rows =
+    candidates.map(
+      candidate => [
+
+        candidate.tournamentId,
+        candidate.type,
+        candidate.scope,
+        candidate.title,
+        candidate.region,
+        candidate.department,
+        candidate.city,
+        candidate.gymnasium,
+        candidate.startDate,
+        candidate.endDate,
+        candidate.categories,
+        candidate.disciplines,
+        candidate.registrationOpenDate,
+        candidate.registrationCloseDate,
+        candidate.eventUrl,
+		candidate.masterAction || '',
+		candidate.masterReason || ''
+
+      ]
+    );
+
+if (rows.length) {
+
+  sheet
+    .getRange(
+      2,
+      6,
+      rows.length,
+      1
+    )
+    .setNumberFormat('@');
+
+  sheet
+    .getRange(
+      2,
+      1,
+      rows.length,
+      MASTER_TOURNAMENT_HEADERS.length
+    )
+    .setValues(rows);
+
+}
+
+}
+
+function analyzeTournamentMasterCandidates() {
+
+  const matches =
+    readTournamentMatches();
+
+  const candidates =
+    matches
+      .filter(
+        match =>
+          match.status === MATCH_STATUS.MATCH
+          ||
+          match.status === MATCH_STATUS.MATCH_OVERRIDE
+      )
+      .map(
+        buildMasterTournament
+      );
+
+  writeMasterCandidates(
+    candidates
+  );
+
+}
+
+function readTournamentMatches() {
+
+  const sheet =
+    SpreadsheetApp.getActive()
+      .getSheetByName(
+        SHEETS.TOURNAMENT_MATCHES
+      );
+
+  const values =
+    sheet.getDataRange()
+      .getValues();
+
+  if (values.length <= 1) {
+    return [];
+  }
+
+  const headers = values[0];
+
+  return values
+    .slice(1)
+    .map(row => {
+
+      const match = {};
+
+      headers.forEach(
+        (header, index) => {
+
+          match[header] = row[index];
+
+        }
+      );
+
+      return match;
+
+    });
+
+}
+
+function buildMergedTournament(
+  match
+) {
+
+  return {
+
+    tournamentId:
+      match.TournamentId,
+
+    type:
+      match.Type,
+
+    city:
+      match.ComiteCity ||
+      match.LigueCity,
+
+    department:
+      match.ComiteDepartment ||
+      match.LigueDepartment,
+
+    region:
+      match.ComiteRegion ||
+      match.LigueRegion,
+
+    scope:
+      match.ComiteScope ||
+      match.LigueScope,
+
+    startDate:
+      match.ComiteStartDate ||
+      match.LigueStartDate,
+
+    endDate:
+      match.ComiteEndDate ||
+      match.LigueEndDate,
+
+    label:
+      match.ComiteLabel ||
+      match.LigueLabel,
+	  
+	  categories:
+		(match.ComiteCategories ||
+		match.LigueCategories ||
+		'')
+		.split(';')
+		.filter(Boolean)
+  };
+}
+
+
+// ATTENTION A SUPPRIMER le 'LIGUE_ONLY' LORSQUE LE CALENDRIER DU COMITE SERA PUBLIE
+function buildMergedTournaments(
+  matches
+) {
+
+  return matches
+    .filter(
+      match =>
+        match.Status === 'MATCH'
+        ||
+        match.Status ===
+          'MATCH_OVERRIDE'
+		  ||
+        match.Status === 'LIGUE_ONLY'
+    )
+    .map(
+      buildMergedTournament
+    );
+
+}
+
+function buildTitle(
+  tournament
+) {
+
+  switch (tournament.type) {
+
+    case COMPETITION_TYPES.BAC: {
+
+      const match =
+        tournament.label.match(
+          /^BAC\s*(\d+)?$/i
+        );
+
+      const number =
+        match?.[1] || '1';
+
+      return `BAC N°${number}`;
+
+    }
+
+    case COMPETITION_TYPES.BNP: {
+
+      const match =
+        tournament.label.match(
+          /(\d+)/
+        );
+
+      return match
+        ? `BNP N°${match[1]}`
+        : tournament.label;
+
+    }
+
+    case COMPETITION_TYPES.CEJ: {
+
+      const match =
+        tournament.label.match(
+          /^CEJ\s+(\d+)$/i
+        );
+
+      return match
+        ? `CEJ N°${match[1]}`
+        : tournament.label;
+
+    }
+
+    case COMPETITION_TYPES.TIJ: {
+
+      const match =
+        tournament.label.match(
+          /^TIJ\s+(\d+)/i
+        );
+
+      return match
+        ? `TIJ N°${match[1]}`
+        : tournament.label;
+
+    }
+
+    case COMPETITION_TYPES.TRJ: {
+
+      const match =
+        tournament.label.match(
+          /^TRJ\s+([SD])(\d+)/i
+        );
+
+      if (!match) {
+        return tournament.label;
+      }
+
+      const discipline =
+        match[1].toUpperCase() === 'S'
+          ? 'Simple'
+          : 'Double';
+
+      return `TRJ N°${match[2]} ${discipline}`;
+
+    }
+	
+	case COMPETITION_TYPES.TDJ: {
+
+	  const match =
+		tournament.label.match(
+		  /^TDJ\s+35\s*-?\s*([^-]+)\s*-/
+		);
+
+	  if (!match) {
+		return tournament.label;
+	  }
+
+	  return `TDJ ${match[1].trim()}`;
+
+	}
+	
+    case COMPETITION_TYPES.CHAMPIONNAT:
+	  return tournament.label;   
+
+    case COMPETITION_TYPES.INTERCLUB:
+      return 'Finale Régionale';
+
+    default:
+      return '';
+  }
+}
+
+function buildCategories(
+  tournament
+) {
+
+  switch (tournament.type) {
+
+    case COMPETITION_TYPES.BAC:
+      return [
+        'Benjamin',
+        'Minime',
+        'Cadet'
+      ];
+
+    case COMPETITION_TYPES.BNP:
+      return [
+        'Poussin'
+      ];
+
+    case COMPETITION_TYPES.CEJ:
+      return [
+        'Benjamin',
+        'Minime',
+        'Cadet'
+      ];
+
+    case COMPETITION_TYPES.TIJ:
+      return [
+        'Poussin',
+        'Benjamin',
+        'Minime',
+        'Cadet'
+      ];
+	  
+	case COMPETITION_TYPES.CHAMPIONNAT:
+
+	  if (
+		tournament.scope === SCOPES.NATIONALE
+	  ) {
+
+		return [
+		  'Benjamin',
+		  'Minime',
+		  'Cadet',
+		  'Junior'
+		];
+
+	  }
+
+	  return [
+		'Poussin',
+		'Benjamin',
+		'Minime',
+		'Cadet'
+	  ];
+
+    case COMPETITION_TYPES.TRJ:
+
+      if (
+        tournament.categories &&
+        tournament.categories.length
+      ) {
+        return tournament.categories;
+      }
+
+      return [
+        'Poussin',
+        'Benjamin',
+        'Minime'
+      ];
+
+    default:
+
+      return tournament.categories || [];
+
+  }
+
+}
+
+function buildDepartmentalDisciplines(
+  competition
+) {
+
+  const parts =
+    competition.label
+      .split('-')
+      .map(part => part.trim().toUpperCase());
+
+  const discipline =
+    parts.find(part =>
+      [
+        'S',
+        'S SI',
+        'DH',
+        'DD',
+        'DH DD'
+      ].includes(part)
+    );
+
+  if (!discipline) {
+    return [];
+  }
+
+  switch (discipline) {
+
+    case 'S':
+    case 'S SI':
+      return ['Simple'];
+
+    case 'DH':
+    case 'DD':
+    case 'DH DD':
+      return ['Double'];
+
+    default:
+      return [];
+
+  }
+
+}
+
+
+function buildDisciplines(
+  tournament
+) {
+
+  switch (tournament.type) {
+
+    case COMPETITION_TYPES.BAC:
+      return [
+        'Simple'
+      ];
+
+    case COMPETITION_TYPES.BNP:
+      return [
+        'Simple'
+      ];
+
+    case COMPETITION_TYPES.CEJ:
+	case COMPETITION_TYPES.CHAMPIONNAT:
+	  return [
+		'Simple',
+		'Double',
+		'Mixte'
+	  ];
+
+    case COMPETITION_TYPES.TRJ: {
+
+      const match =
+        tournament.label.match(
+          /^TRJ\s+([SD])/i
+        );
+
+      if (
+        match &&
+        match[1].toUpperCase() === 'S'
+      ) {
+        return [
+          'Simple'
+        ];
+      }
+
+      return [
+        'Double',
+        'Mixte'
+      ];
+
+    }
+	
+	case COMPETITION_TYPES.TDJ:
+		return buildDepartmentalDisciplines(tournament);
+	
+    case COMPETITION_TYPES.TIJ:
+    default:
+      return [];
+
+  }
+
+}
+
+function buildMasterCandidate(
+  competition
+) {
+
+  return {
+
+    tournamentId:
+      competition.tournamentId,
+
+    type:
+      competition.type,
+
+    scope:
+      competition.scope || '',
+
+    title:
+      competition.title || '',
+
+    region:
+      competition.region || '',
+
+    department:
+      competition.department || '',
+
+    city:
+      competition.city || '',
+
+    gymnasium: '',
+
+    startDate:
+      competition.startDate,
+
+    endDate:
+      competition.endDate,
+
+    categories:
+      (competition.categories || [])
+        .join(';'),
+
+    disciplines:
+      (competition.disciplines || [])
+        .join(';'),
+
+    registrationOpenDate: '',
+
+    registrationCloseDate: '',
+
+    eventUrl: ''
+
+  };
+
+}
+
+function isMasterCompetition(
+  competition
+) {
+
+  if (
+    competition.scope ===
+    SCOPES.DEPARTEMENTALE
+  ) {
+
+    return (
+      competition.source ===
+      SOURCES.COMITE_35
+    );
+
+  }
+
+  return (
+    competition.source ===
+    SOURCES.LIGUE_BRETAGNE
+  );
+
+}
+
+function buildMasterCandidates(
+  competitions
+) {
+
+  return competitions
+    .filter(
+      isMasterCompetition
+    )
+    .map(
+      buildMasterCandidate
+    );
+
+}
+
+function enrichCompetitions(
+  competitions
+) {
+
+  competitions.forEach(
+	enrichCompetition
+  );
+
+  buildTIJDisciplines(
+    competitions
+  );
+
+  return competitions;
+
+}
+
+function enrichCompetition(
+  competition
+) {
+
+  enrichLocation(
+    competition
+  );
+
+}
+
+function buildTIJDisciplines(
+  competitions
+) {
+
+  const grouped = {};
+
+  competitions
+    .filter(
+      c =>
+        c.type ===
+        COMPETITION_TYPES.TIJ
+    )
+    .forEach(c => {
+
+      if (!grouped[c.tournamentId]) {
+        grouped[c.tournamentId] = [];
+      }
+
+      grouped[c.tournamentId].push(c);
+
+    });
+
+  Object.values(grouped)
+    .forEach(group => {
+
+      group.sort(
+        (a, b) =>
+          a.startDate - b.startDate
+      );
+
+      if (group[0]) {
+        group[0].disciplines =
+          ['Simple'];
+      }
+
+      if (group[1]) {
+        group[1].disciplines =
+          [
+            'Double',
+            'Mixte'
+          ];
+      }
+
+    });
+
+}
+
+function analyzeMasterCandidates(
+  candidates,
+  masterTournaments
+) {
+
+  candidates.forEach(
+    candidate => {
+
+      const matches =
+        masterTournaments.filter(
+          tournament =>
+			String(tournament.tournamentId).toUpperCase() ===
+			String(candidate.tournamentId).toUpperCase()
+        );
+
+      if (matches.length === 0) {
+
+        candidate.masterAction =
+          'CREATE';
+
+        candidate.masterReason =
+          'TournamentId not found';
+
+        return;
+
+      }
+
+      if (matches.length === 1) {
+
+        compareMasterCandidate(
+          candidate,
+          matches[0]
+        );
+
+        return;
+
+      }
+
+      const matchingTournament =
+        matches.find(
+          tournament =>
+            sameDate(
+              tournament.startDate,
+              candidate.startDate
+            )
+            &&
+            tournament.categories ===
+              candidate.categories
+        );
+
+      if (!matchingTournament) {
+
+        candidate.masterAction =
+          'CREATE';
+
+        candidate.masterReason =
+          'No matching occurrence';
+
+        return;
+
+      }
+
+      compareMasterCandidate(
+        candidate,
+        matchingTournament
+      );
+
+    }
+  );
+
+}
+
+function compareMasterCandidate(
+  candidate,
+  master
+) {
+
+  const differences = [];
+  
+  Logger.log(candidate);
+  Logger.log(master);
+  if (
+    candidate.title !== master.title
+  ) {
+    differences.push('Title');
+  }
+
+  if (
+    String(candidate.region).toUpperCase() !== String(master.region).toUpperCase()
+  ) {
+    differences.push('Region');
+  }
+
+  if (
+    candidate.department !==
+    master.department
+  ) {
+    differences.push('Department');
+  }
+
+  if (
+    candidate.city !== master.city
+  ) {
+    differences.push('City');
+  }
+
+  if (
+    candidate.categories !==
+    master.categories
+  ) {
+    differences.push('Categories');
+  }
+
+  if (
+    candidate.disciplines !==
+    master.disciplines
+  ) {
+    differences.push('Disciplines');
+  }
+
+  if (differences.length === 0) {
+
+    candidate.masterAction =
+      'UNCHANGED';
+
+    candidate.masterReason =
+      '';
+
+    return;
+
+  }
+
+  candidate.masterAction =
+    'UPDATE';
+
+  candidate.masterReason =
+    differences.join('; ');
+
+}
+
+function readTournamentMaster() {
+
+  const sheet =
+    SpreadsheetApp.getActive()
+      .getSheetByName(
+        SHEETS.TOURNAMENT_MASTER
+      );
+
+  const values =
+    sheet.getDataRange()
+      .getValues();
+
+  if (values.length <= 1) {
+    return [];
+  }
+
+  return values
+    .slice(1)
+    .map(row => ({
+
+      tournamentId: row[0],
+      type: row[1],
+      scope: row[2],
+      title: row[3],
+
+      region: row[4],
+	  department: normalizeDepartment(row[5]),
+      city: row[6],
+
+      gymnasium: row[7],
+
+      startDate: row[8],
+      endDate: row[9],
+
+      categories: row[10] || '',
+      disciplines: row[11] || ''
+
+    }));
+
+}
+
+function enrichLocation(
+  competition
+) {
+
+  if (!competition.city) {
+    return;
+  }
+
+  const reference =
+    CITY_REFERENCES[
+      competition.city
+    ];
+
+  if (!reference) {
+    return;
+  }
+
+  if (!competition.department) {
+    competition.department =
+      reference.department;
+  }
+
+  if (!competition.region) {
+    competition.region =
+      reference.region;
+  }
+
+}
+
+function normalizeDepartment(value) {
+
+  if (
+    value === '' ||
+    value === null ||
+    value === undefined
+  ) {
+    return '';
+  }
+
+  return String(value)
+    .replace(/\.0$/, '')
+    .padStart(2, '0');
 
 }

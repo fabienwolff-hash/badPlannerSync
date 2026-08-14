@@ -123,7 +123,7 @@ function parseQualificationFranceJeunes(
     source: SOURCES.LIGUE_BRETAGNE,
     type: COMPETITION_TYPES.CHAMPIONNAT,
     scope: SCOPES.NATIONALE,
-    label: "Qualification France Jeunes",
+    label: "Championnat France - Qualification",
     startDate,
     endDate,
     rawData: cell
@@ -161,7 +161,7 @@ function parseChampionnatsFranceJeunes(
     source: SOURCES.LIGUE_BRETAGNE,
     type: COMPETITION_TYPES.CHAMPIONNAT,
     scope: SCOPES.NATIONALE,
-    label: "Championnats de France Jeunes",
+    label: "Championnat France - Phase finale",
     startDate,
     endDate,
     city: locationInfo?.city,

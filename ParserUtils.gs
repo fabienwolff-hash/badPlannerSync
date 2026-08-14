@@ -315,3 +315,121 @@ function normalizeCompetitionLabel(
   );
 
 }
+
+let rejectedCompetitions = {};
+
+function rejectCompetition(
+  source,
+  label
+) {
+
+  const key =
+    `${source}|${label}`;
+
+  if (
+    rejectedCompetitions[key]
+  ) {
+    return null;
+  }
+
+  rejectedCompetitions[key] = {
+    source,
+    label
+  };
+
+  return null;
+
+}
+
+function writeRejectedCompetitions() {
+
+  const sheet =
+    SpreadsheetApp.getActive()
+      .getSheetByName(
+        SHEETS.TOURNAMENT_REJECTIONS
+      );
+
+  const overrides = loadRejectionOverrides();
+
+ const rows =
+  Object.values(
+    rejectedCompetitions
+  )
+  .filter(
+    rejection =>
+      !overrides[
+        `${rejection.source}|${rejection.label}`
+      ]
+  )
+  .map(
+    rejection => [
+      rejection.source,
+      rejection.label,
+	  ''
+    ]
+  );
+
+  sheet.clearContents();
+
+  const headers = [
+    'Source',
+    'Label',
+    'Comment'
+  ];
+
+  sheet
+    .getRange(
+      1,
+      1,
+      1,
+      headers.length
+    )
+    .setValues([headers]);
+
+  if (rows.length) {
+
+    sheet
+      .getRange(
+        2,
+        1,
+        rows.length,
+        headers.length
+      )
+      .setValues(rows);
+
+  }
+
+}
+
+function loadRejectionOverrides() {
+
+  const sheet =
+    SpreadsheetApp.getActive()
+      .getSheetByName(
+        SHEETS.TOURNAMENT_REJECTION_OVERRIDES
+      );
+
+  if (!sheet) {
+    return {};
+  }
+
+  const overrides = {};
+
+  sheet
+    .getDataRange()
+    .getValues()
+    .slice(1)
+    .forEach(row => {
+
+      const source = row[0];
+      const label = row[1];
+		
+      overrides[
+        `${source}|${label}`
+      ] = true;
+
+    });
+
+  return overrides;
+
+}

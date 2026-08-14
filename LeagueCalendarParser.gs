@@ -297,9 +297,12 @@ function parsePromobadCompetitions(calendar) {
     }
 
     const locationInfo = extractCityAndDepartment(locationCell);
+	if (locationCell === 'Lieu') {
+	  return;
+	}
 
     if (!locationInfo) {
-      return;
+      return rejectCompetition(SOURCES.LIGUE_BRETAGNE,locationCell);
     }
 
     if (
@@ -307,13 +310,13 @@ function parsePromobadCompetitions(calendar) {
         locationInfo
       )
     ) {
-      return;
+      return rejectCompetition(SOURCES.LIGUE_BRETAGNE,locationCell);
     }
 
     if (
       !isYouthPromobad(tableauCell)
     ) {
-      return;
+      return rejectCompetition(SOURCES.LIGUE_BRETAGNE,tableauCell);
     }
 
     const startDate = buildDate(
@@ -387,7 +390,7 @@ function parseYouthCompetitions(calendar) {
       const competitionType = getCompetitionType(normalizedLabel);
 
       if (!competitionType) {
-        continue;
+        return;
       }
 
       switch (competitionType) {

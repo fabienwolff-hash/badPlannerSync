@@ -11,7 +11,7 @@ const LIGUE_CALENDAR_CONFIG = {
     ),
 
   LIGUE_SHEET_NAME:
-    "CALENDRIER SPORTIF 2025-2026"
+    "CALENDRIER SPORTIF 2026-2027"
 };
 
 const COMMITTEE35_CALENDAR_CONFIG = {
@@ -23,6 +23,15 @@ const COMMITTEE35_CALENDAR_CONFIG = {
   SHEET_NAME: "CALENDRIER SPORTIF 2025-2026"
 };
 
+const BADPLANNER_CONFIG = {
+  SPREADSHEET_ID:
+    PropertiesService.getScriptProperties().getProperty(
+      "BADPLANNER_SPREADSHEET_ID"
+    ),
+
+  SHEET_NAME: "MASTER"
+};
+
 // =================================================
 // Feuilles BPS
 // =================================================
@@ -31,6 +40,10 @@ const SHEETS = {
   SNAPSHOT_LIGUE: 'SNAPSHOT_LIGUE',
   SNAPSHOT_COMITE_35: 'SNAPSHOT_COMITE_35',
   NORMALIZATION_RULES: 'NORMALIZATION_RULES',
+  TOURNAMENT_REJECTIONS: 'TOURNAMENT_REJECTIONS',
+  TOURNAMENT_REJECTION_OVERRIDES: 'TOURNAMENT_REJECTION_OVERRIDES',
+  TOURNAMENT_MASTER: 'TOURNAMENT_MASTER',
+  TOURNAMENT_MASTER_CANDIDATES: 'TOURNAMENT_MASTER_CANDIDATES',
 
   TOURNAMENT_MATCHES: "TOURNAMENT_MATCHES",
   TOURNAMENT_MATCH_OVERRIDES: "TOURNAMENT_MATCH_OVERRIDES"
@@ -245,3 +258,25 @@ const MATCH_STATUS = {
   LIGUE_ONLY: 'LIGUE_ONLY',
   COMITE_ONLY: 'COMITE_ONLY'
 };
+
+const MASTER_TOURNAMENT_HEADERS = [
+
+  'TournamentId',
+  'Type',
+  'Scope',
+  'Title',
+  'Region',
+  'Department',
+  'City',
+  'Gymnasium',
+  'StartDate',
+  'EndDate',
+  'Categories',
+  'Disciplines',
+  'RegistrationOpenDate',
+  'RegistrationCloseDate',
+  'EventUrl',
+  'MasterAction',
+  'MasterReason'
+
+];

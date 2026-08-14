@@ -106,16 +106,16 @@ function buildChampionnatTournamentId(
 
   switch (competition.label) {
 
-    case "Qualification France Jeunes":
+    case "Championnat France - Qualification":
       return `CHP-${month}-FRANCE-QLF`;
 
-    case "Championnats de France Jeunes":
+    case "Championnat France - Phase finale":
       return `CHP-${month}-FRANCE`;
 	  
-	case "Championnat de Bretagne Jeunes":
-	  return `CHP-${month}-BRETAGNE`;
+	case "Championnat Régional":
+	  return `CHP-${month}-REGIONAL`;
 	  
-	case "Championnats Départementaux Jeunes":
+	case "Championnat Départemental":
 	  return `CHP-${month}-DEPARTEMENTAL`;
 
     default:

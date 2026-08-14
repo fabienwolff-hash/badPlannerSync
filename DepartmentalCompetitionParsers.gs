@@ -22,7 +22,7 @@ function parseChampionnatsDepartementauxJeunes(
     source: SOURCES.LIGUE_BRETAGNE,
     type: COMPETITION_TYPES.CHAMPIONNAT,
     scope: SCOPES.DEPARTEMENTALE,
-    label: "Championnats Départementaux Jeunes",
+    label: "Championnat Départemental",
 
     startDate,
     endDate,
@@ -59,11 +59,7 @@ function parseCDJLabel(label) {
     };
   }
 
-  Logger.log(
-    `Format CDJ inconnu : ${label}`
-  );
-
-  return null;
+  return rejectCompetition(SOURCES.LIGUE_BRETAGNE,label);
 
 }
 
@@ -77,7 +73,7 @@ function parseCommitteeCDJLabel(
     );
 
   if (!match) {
-    return null;
+    return rejectCompetition(SOURCES.COMITE_35,label);
   }
 
   return {
@@ -93,22 +89,7 @@ function parseTDJLabel(label) {
     .replace(/\s+/g, ' ')
     .trim();
 
-  //
-  // TDJ 35 Etrelles - S - R4 à NC
-  //
-  let match = normalized.match(
-    /^TDJ\s+(\d+)\s+(.+?)\s*-\s*(.+?)\s*-\s*(.+)$/
-  );
-
-  if (match) {
-    return {
-      department: match[1],
-      city: match[2].trim(),
-      disciplines: match[3].trim(),
-      categoryOrRanking: match[4].trim()
-    };
-  }
-
+  let match;
   //
   // TDJ 35 - Etrelles - S - R4 à NC
   //
@@ -124,7 +105,24 @@ function parseTDJLabel(label) {
       categoryOrRanking: match[4].trim()
     };
   }
+   
+  //
+  // TDJ 35 Etrelles - S - R4 à NC
+  //
+  match = normalized.match(
+    /^TDJ\s+(\d+)\s+(.+?)\s*-\s*(.+?)\s*-\s*(.+)$/
+  );
 
+  if (match) {
+    return {
+      department: match[1],
+      city: match[2].trim(),
+      disciplines: match[3].trim(),
+      categoryOrRanking: match[4].trim()
+    };
+  }
+
+ 
   //
   // TDJ 56 - Kervignac - MBad à Jun
   //
@@ -162,7 +160,7 @@ function parseTDJLabel(label) {
     `Format TDJ inconnu : ${label}`
   );
 
-  return null;
+  return rejectCompetition(SOURCES.COMITE_35,label);
 
 }
 
@@ -201,7 +199,7 @@ const parsed = parseCDJLabel(cell);
 		`CDJ non 35 : ${cell}`
 	  );
 
-	  return null;
+	  return rejectCompetition(SOURCES.LIGUE_BRETAGNE,cell);
 	}
 
   return createCompetition({
@@ -252,7 +250,7 @@ function parseTDJ(
 		`CDJ non 35 : ${cell}`
 	  );
 
-	  return null;
+	  return rejectCompetition(SOURCES.LIGUE_BRETAGNE,cell);
 	}
 	
   return createCompetition({
