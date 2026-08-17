@@ -22,16 +22,17 @@ function buildDate(
   return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
 }
 
-function addDays(dateString, days) {
-  const date = new Date(dateString);
+function addDays(
+  dateString,
+  days
+) {
+
+  const date = toDate(dateString);
 
   date.setDate(date.getDate() + days);
 
-  return Utilities.formatDate(
-    date,
-    Session.getScriptTimeZone(),
-    "yyyy-MM-dd"
-  );
+  return formatDate(date);
+
 }
 
 function getCompetitionDates(
@@ -83,8 +84,42 @@ function sameDate(
 ) {
 
   return (
-    new Date(date1).getTime() ===
-    new Date(date2).getTime()
+    toDate(date1).getTime() ===
+    toDate(date2).getTime()
+  );
+
+}
+
+function getMonthFromDate(
+  date
+) {
+
+  return String(
+    toDate(date).getMonth() + 1
+  ).padStart(2, '0');
+
+}
+
+function toDate(date) {
+
+  return date instanceof Date
+    ? date
+    : new Date(date);
+
+}
+
+function formatDate(
+  value
+) {
+
+  if (!value) {
+    return '';
+  }
+
+  return Utilities.formatDate(
+    toDate(value),
+    Session.getScriptTimeZone(),
+    'yyyy-MM-dd'
   );
 
 }

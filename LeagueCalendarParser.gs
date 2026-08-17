@@ -390,7 +390,7 @@ function parseYouthCompetitions(calendar) {
       const competitionType = getCompetitionType(normalizedLabel);
 
       if (!competitionType) {
-        return;
+        continue;
       }
 
       switch (competitionType) {

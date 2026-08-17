@@ -27,15 +27,6 @@ function isIlleEtVilaineYouthCompetition(
   return true;
 }
 
-function isYouthPromobad(
-  tableau
-) {
-  return PROMOBAD_AGE_MARKERS.some(
-    marker => tableau.includes(marker)
-  );
-}
-
-
 function extractCityAndDepartment(value) {
 
   const match =
@@ -266,27 +257,13 @@ function loadNormalizationRules() {
 
 }
 
-let normalizationRulesCache = null;
-
-function getNormalizationRules() {
-
-  if (!normalizationRulesCache) {
-
-    normalizationRulesCache =
-      loadNormalizationRules();
-
-  }
-
-  return normalizationRulesCache;
-
-}
-
 function normalizeValue(
   value,
   type
 ) {
 
-  const rules = getNormalizationRules();
+  const rules = getRulesByType(RULE_TYPES.NORMALIZATION);
+
   let normalized = value;
 
   rules.forEach(
@@ -341,94 +318,20 @@ function rejectCompetition(
 
 }
 
-function writeRejectedCompetitions() {
-
-  const sheet =
-    SpreadsheetApp.getActive()
-      .getSheetByName(
-        SHEETS.TOURNAMENT_REJECTIONS
-      );
-
-  const overrides = loadRejectionOverrides();
-
- const rows =
-  Object.values(
-    rejectedCompetitions
-  )
-  .filter(
-    rejection =>
-      !overrides[
-        `${rejection.source}|${rejection.label}`
-      ]
-  )
-  .map(
-    rejection => [
-      rejection.source,
-      rejection.label,
-	  ''
-    ]
-  );
-
-  sheet.clearContents();
-
-  const headers = [
-    'Source',
-    'Label',
-    'Comment'
-  ];
-
-  sheet
-    .getRange(
-      1,
-      1,
-      1,
-      headers.length
-    )
-    .setValues([headers]);
-
-  if (rows.length) {
-
-    sheet
-      .getRange(
-        2,
-        1,
-        rows.length,
-        headers.length
-      )
-      .setValues(rows);
-
-  }
-
-}
-
 function loadRejectionOverrides() {
-
-  const sheet =
-    SpreadsheetApp.getActive()
-      .getSheetByName(
-        SHEETS.TOURNAMENT_REJECTION_OVERRIDES
-      );
-
-  if (!sheet) {
-    return {};
-  }
 
   const overrides = {};
 
-  sheet
-    .getDataRange()
-    .getValues()
-    .slice(1)
-    .forEach(row => {
+  getRulesByType(
+    RULE_TYPES.REJECTION_OVERRIDE
+  )
+  .forEach(rule => {
 
-      const source = row[0];
-      const label = row[1];
-		
-      overrides[
-        `${source}|${label}`
-      ] = true;
+    overrides[
+      rule.key
+    ] = true;
 
-    });
+  });
 
   return overrides;
 

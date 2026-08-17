@@ -247,7 +247,7 @@ function parseTDJ(
 	  )
 	) {
 	  Logger.log(
-		`CDJ non 35 : ${cell}`
+		`TDJ non 35 : ${cell}`
 	  );
 
 	  return rejectCompetition(SOURCES.LIGUE_BRETAGNE,cell);
@@ -341,4 +341,23 @@ function parseMultiDisciplineTdj(
 
     });
 
+}
+
+function normalizeCommitteeCDJLabel(
+  label
+) {
+
+  const closingParenthesisIndex =
+    label.indexOf(')');
+
+  if (
+    closingParenthesisIndex === -1
+  ) {
+    return label;
+  }
+
+  return label.substring(
+    0,
+    closingParenthesisIndex + 1
+  );
 }

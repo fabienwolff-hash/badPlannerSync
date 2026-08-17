@@ -36,10 +36,6 @@ function buildTournamentId(competition) {
   }
 }
 
-function getMonthFromDate(date) {
-  return date.substring(5, 7);
-}
-
 function extractTournamentNumber(label) {
   const match = label.match(/(\d+)/);
 
@@ -54,15 +50,10 @@ function buildNumberedTournamentId(
   prefix,
   competition
 ) {
-  const month =
-    getMonthFromDate(
-      competition.startDate
-    );
 
-  const number =
-    extractTournamentNumber(
-      competition.label
-    );
+  const month = getMonthFromDate(competition.startDate);
+
+  const number = extractTournamentNumber(competition.label);
 
   return `${prefix}-${month}-${number}`;
 }

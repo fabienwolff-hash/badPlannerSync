@@ -379,8 +379,7 @@ function analyzeTournamentMatches() {
       competitions
     );
 
-  const overrides =
-    loadMatchOverrides();
+  const overrides = loadMatchOverrides();
 
   matches =
     applyOverrides(
@@ -410,10 +409,10 @@ function compareCompetitions(
 ) {
 
 const dateMatch =
-  normalizeDate(
+  formatDate(
     ligue.startDate
   ) ===
-  normalizeDate(
+  formatDate(
     comite.startDate
   );
 
@@ -475,22 +474,6 @@ function normalizeMatchValue(
 
 }
 
-
-function normalizeDate(
-  value
-) {
-
-  if (!value) {
-    return '';
-  }
-
-  return Utilities.formatDate(
-    new Date(value),
-    Session.getScriptTimeZone(),
-    'yyyy-MM-dd'
-  );
-
-}
 
 function findPotentialMatches(
   matches
@@ -604,10 +587,10 @@ function calculateMatchScore(
     comiteMatch.comite;
 
   if (
-    normalizeDate(
+    formatDate(
       ligue.startDate
     ) ===
-    normalizeDate(
+    formatDate(
       comite.startDate
     )
   ) {
@@ -640,29 +623,18 @@ function calculateMatchScore(
 
 function loadMatchOverrides() {
 
-  const sheet =
-    SpreadsheetApp.getActive()
-      .getSheetByName(
-        SHEETS.TOURNAMENT_MATCH_OVERRIDES
-      );
+  return getRulesByType(
+    RULE_TYPES.MATCH_OVERRIDE
+  )
+    .map(rule => ({
 
-  if (!sheet) {
-    return [];
-  }
+      ligueTournamentId:
+        rule.key,
 
-  return sheet
-    .getDataRange()
-    .getValues()
-    .slice(1)
-    .map(row => ({
-      ligueTournamentId: row[0],
-      comiteTournamentId: row[1]
-    }))
-    .filter(
-      override =>
-        override.ligueTournamentId &&
-        override.comiteTournamentId
-    );
+      comiteTournamentId:
+        rule.value1
+
+    }));
 
 }
 
@@ -845,81 +817,6 @@ function syncTournamentMaster() {
 
 }
 
-function buildMasterTournament(
-  competition
-) {
-
-  return {
-
-    tournamentId:
-      competition.tournamentId,
-
-    type:
-      competition.type,
-
-    scope: '',
-
-	title: buildTitle(tournament),
-
-    region: '',
-
-    department:
-      competition.department || '',
-
-    city:
-      competition.city || '',
-
-    gymnasium: '',
-
-    startDate:
-      competition.startDate,
-
-    endDate:
-      competition.endDate,
-
-    categories:
-      (competition.categories || [])
-        .join(';'),
-
-    disciplines: '',
-
-    registrationOpenDate: '',
-
-    registrationCloseDate: '',
-
-    eventUrl: ''
-
-  };
-
-}
-
-function resolveScope(
-  competition
-) {
-
-  switch (competition.type) {
-
-    case COMPETITION_TYPES.TIJ:
-    case COMPETITION_TYPES.BNP:
-    case COMPETITION_TYPES.CEJ:
-    case COMPETITION_TYPES.BAC:
-      return SCOPES.NATIONALE;
-
-    case COMPETITION_TYPES.TRJ:
-      return SCOPES.REGIONALE;
-
-    case COMPETITION_TYPES.TDJ:
-    case COMPETITION_TYPES.CDJ:
-    case COMPETITION_TYPES.PROMOBAD:
-      return SCOPES.DEPARTEMENTALE;
-
-    default:
-      return '';
-
-  }
-
-}
-
 function writeMasterCandidates(
   candidates
 ) {
@@ -992,29 +889,6 @@ if (rows.length) {
 
 }
 
-function analyzeTournamentMasterCandidates() {
-
-  const matches =
-    readTournamentMatches();
-
-  const candidates =
-    matches
-      .filter(
-        match =>
-          match.status === MATCH_STATUS.MATCH
-          ||
-          match.status === MATCH_STATUS.MATCH_OVERRIDE
-      )
-      .map(
-        buildMasterTournament
-      );
-
-  writeMasterCandidates(
-    candidates
-  );
-
-}
-
 function readTournamentMatches() {
 
   const sheet =
@@ -1050,77 +924,6 @@ function readTournamentMatches() {
       return match;
 
     });
-
-}
-
-function buildMergedTournament(
-  match
-) {
-
-  return {
-
-    tournamentId:
-      match.TournamentId,
-
-    type:
-      match.Type,
-
-    city:
-      match.ComiteCity ||
-      match.LigueCity,
-
-    department:
-      match.ComiteDepartment ||
-      match.LigueDepartment,
-
-    region:
-      match.ComiteRegion ||
-      match.LigueRegion,
-
-    scope:
-      match.ComiteScope ||
-      match.LigueScope,
-
-    startDate:
-      match.ComiteStartDate ||
-      match.LigueStartDate,
-
-    endDate:
-      match.ComiteEndDate ||
-      match.LigueEndDate,
-
-    label:
-      match.ComiteLabel ||
-      match.LigueLabel,
-	  
-	  categories:
-		(match.ComiteCategories ||
-		match.LigueCategories ||
-		'')
-		.split(';')
-		.filter(Boolean)
-  };
-}
-
-
-// ATTENTION A SUPPRIMER le 'LIGUE_ONLY' LORSQUE LE CALENDRIER DU COMITE SERA PUBLIE
-function buildMergedTournaments(
-  matches
-) {
-
-  return matches
-    .filter(
-      match =>
-        match.Status === 'MATCH'
-        ||
-        match.Status ===
-          'MATCH_OVERRIDE'
-		  ||
-        match.Status === 'LIGUE_ONLY'
-    )
-    .map(
-      buildMergedTournament
-    );
 
 }
 

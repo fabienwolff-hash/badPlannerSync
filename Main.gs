@@ -2,7 +2,7 @@ function main() {
 
   rejectedCompetitions = {};
 
-  normalizationRulesCache = null;
+  rulesCache = null;
 
   syncTournamentMaster();
 
@@ -11,8 +11,6 @@ function main() {
   //generateCommittee35Snapshot();
 
   analyzeTournamentMatches();
-
-  writeRejectedCompetitions();
 
 const competitions =
   readSnapshotCompetitions();
@@ -35,4 +33,6 @@ analyzeMasterCandidates(
 writeMasterCandidates(
   masterCandidates
 );
+
+generateSummary();
 }
