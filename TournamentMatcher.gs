@@ -1555,6 +1555,20 @@ function readTournamentMaster() {
 
 }
 
+let cityReferencesCache = null;
+
+function getCityReferences() {
+
+  if (!cityReferencesCache) {
+    cityReferencesCache =
+      loadCityReferences();
+  }
+
+  return cityReferencesCache;
+
+}
+
+
 function enrichLocation(
   competition
 ) {
@@ -1562,11 +1576,9 @@ function enrichLocation(
   if (!competition.city) {
     return;
   }
-
-  const reference =
-    CITY_REFERENCES[
-      competition.city
-    ];
+  
+  const reference = getCityReferences()[competition.city];
+  
 
   if (!reference) {
     return;

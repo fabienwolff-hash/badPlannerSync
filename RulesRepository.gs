@@ -52,3 +52,28 @@ function getRulesByType(
     );
 
 }
+
+function loadCityReferences() {
+
+  const references = {};
+
+  getRulesByType(
+    RULE_TYPES.CITY_REFERENCE
+  )
+  .forEach(rule => {
+
+    references[rule.key] = {
+
+      department:
+        rule.value1,
+
+      region:
+        rule.value2
+
+    };
+
+  });
+
+  return references;
+
+}
