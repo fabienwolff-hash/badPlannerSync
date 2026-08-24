@@ -8,7 +8,7 @@ function main() {
 
   generateLeagueSnapshot();
 
-  //generateCommittee35Snapshot();
+  generateCommittee35Snapshot();
 
   analyzeTournamentMatches();
 
@@ -18,8 +18,8 @@ const competitions =
   enrichCompetitions(competitions);
 
 const masterCandidates =
-  competitions.map(
-    buildMasterCandidate
+  buildMasterCandidates(
+    competitions
   );
 
 const masterTournaments =

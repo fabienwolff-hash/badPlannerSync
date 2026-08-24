@@ -32,7 +32,12 @@ function createCompetition(data) {
 
     ...(data.categories && {
       categories: data.categories
-    })
+    }),
+	
+	...(data.disciplines && {
+	  disciplines: data.disciplines
+	})
+
 
   };
 
@@ -68,10 +73,17 @@ function createCompetition(data) {
 
   }
 
-  competition.disciplines =
-    buildDisciplines(
-      competition
-    );
+	if (
+	  !competition.disciplines ||
+	  !competition.disciplines.length
+	) {
+
+	  competition.disciplines =
+		buildDisciplines(
+		  competition
+		);
+
+	}
 
   competition.tournamentId =
     buildTournamentId(

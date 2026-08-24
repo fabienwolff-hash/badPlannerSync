@@ -105,41 +105,6 @@ function groupCompetitionsByTournamentId(
   return groups;
 }
 
-function inspectMatches() {
-
-  const competitions =
-    readSnapshotCompetitions();
-
-  const groups =
-    groupCompetitionsByTournamentId(
-      competitions
-    );
-
-  Object.entries(groups)
-    .forEach(([key, values]) => {
-
-      Logger.log(
-        '================================'
-      );
-
-      Logger.log(key);
-
-      values.forEach(
-        competition => {
-
-          Logger.log(
-            JSON.stringify(
-              competition
-            )
-          );
-
-        }
-      );
-
-    });
-
-}
-
 function buildTournamentMatches(
   competitions
 ) {
@@ -216,26 +181,6 @@ function buildTournamentMatches(
       };
 
     });
-
-}
-
-function inspectTournamentMatches() {
-
-  const competitions =
-    readSnapshotCompetitions();
-
-  const matches =
-    buildTournamentMatches(
-      competitions
-    );
-
-  Logger.log(
-    JSON.stringify(
-      matches,
-      null,
-      2
-    )
-  );
 
 }
 
@@ -638,23 +583,6 @@ function loadMatchOverrides() {
 
 }
 
-function findOverride(
-  ligueTournamentId,
-  comiteTournamentId,
-  overrides
-) {
-
-  return overrides.find(
-    override =>
-      override.ligueTournamentId ===
-        ligueTournamentId
-      &&
-      override.comiteTournamentId ===
-        comiteTournamentId
-  );
-
-}
-
 function applyOverrides(
   matches,
   overrides
@@ -1006,26 +934,46 @@ function buildTitle(
 
     }
 	
-	case COMPETITION_TYPES.TDJ: {
+	case COMPETITION_TYPES.TDJ:
+
+	  if (tournament.city) {
+		return `TDJ ${tournament.city}`;
+	  }
+
+	  return tournament.label;
+	  
+	case COMPETITION_TYPES.PROMOBAD:
+      return `Promobad ${tournament.city}`;
+	
+	case COMPETITION_TYPES.CDJ: {
 
 	  const match =
 		tournament.label.match(
-		  /^TDJ\s+35\s*-?\s*([^-]+)\s*-/
+		  /^CDJ\s+n°(\d+)\s+(Simple|Double)/i
 		);
 
 	  if (!match) {
 		return tournament.label;
 	  }
 
-	  return `TDJ ${match[1].trim()}`;
+	  return `CDJ N°${match[1]} ${match[2]}`;
 
 	}
 	
     case COMPETITION_TYPES.CHAMPIONNAT:
 	  return tournament.label;   
 
-    case COMPETITION_TYPES.INTERCLUB:
-      return 'Finale Régionale';
+	case COMPETITION_TYPES.INTERCLUB:
+
+	  if (
+		tournament.scope ===
+		SCOPES.REGIONALE
+	  ) {
+		return 'Interclub Finale Régionale';
+	  }
+
+	  return tournament.label;
+
 
     default:
       return '';
@@ -1102,9 +1050,19 @@ function buildCategories(
         'Minime'
       ];
 
-    default:
+	case COMPETITION_TYPES.CDJ:
 
-      return tournament.categories || [];
+	  return [
+		'Minibad',
+		'Poussin',
+		'Benjamin',
+		'Minime',
+		'Cadet'
+	  ];
+
+	default:
+
+	  return tournament.categories || [];
 
   }
 
@@ -1122,33 +1080,40 @@ function buildDepartmentalDisciplines(
   const discipline =
     parts.find(part =>
       [
-        'S',
-        'S SI',
-        'DH',
-        'DD',
-        'DH DD'
-      ].includes(part)
+	  'S',
+	  'S SI',
+	  'SIMPLE',
+	  'SH',
+	  'SH / SD',
+	  'DH',
+	  'DD',
+	  'DH DD',
+	  'DOUBLE'
+	].includes(part)
     );
 
   if (!discipline) {
     return [];
   }
 
-  switch (discipline) {
+switch (discipline) {
 
-    case 'S':
-    case 'S SI':
-      return ['Simple'];
+  case 'S':
+  case 'S SI':
+  case 'SIMPLE':
+  case 'SH':
+  case 'SH / SD':
+    return ['Simple'];
 
-    case 'DH':
-    case 'DD':
-    case 'DH DD':
-      return ['Double'];
+  case 'DH':
+  case 'DD':
+  case 'DH DD':
+  case 'DOUBLE':
+    return ['Double'];
 
-    default:
-      return [];
-
-  }
+  default:
+    return [];
+}
 
 }
 
@@ -1176,6 +1141,23 @@ function buildDisciplines(
 		'Double',
 		'Mixte'
 	  ];
+	  
+	case COMPETITION_TYPES.CDJ: {
+
+	  const match =
+		tournament.label.match(
+		  /CDJ\s+n°\d+\s+(Simple|Double)/i
+		);
+
+	  if (!match) {
+		return [];
+	  }
+
+	  return match[1].toUpperCase() === 'SIMPLE'
+		? ['Simple']
+		: ['Double','Mixte'];
+
+	}  
 
     case COMPETITION_TYPES.TRJ: {
 
@@ -1201,7 +1183,29 @@ function buildDisciplines(
     }
 	
 	case COMPETITION_TYPES.TDJ:
-		return buildDepartmentalDisciplines(tournament);
+
+	  if (
+		tournament.disciplines &&
+		tournament.disciplines.length
+	  ) {
+		return tournament.disciplines;
+	  }
+
+	  return buildDepartmentalDisciplines(
+		tournament
+	  );
+	
+	case COMPETITION_TYPES.PROMOBAD:
+
+	  if (
+		tournament.disciplines &&
+		tournament.disciplines.length
+	  ) {
+		return tournament.disciplines;
+	  }
+
+	  return [];
+
 	
     case COMPETITION_TYPES.TIJ:
     default:
@@ -1235,8 +1239,7 @@ function buildMasterCandidate(
     department:
       competition.department || '',
 
-    city:
-      competition.city || '',
+	city: resolveCityAlias(competition.city || ''),
 
     gymnasium: '',
 
@@ -1297,7 +1300,22 @@ function buildMasterCandidates(
     )
     .map(
       buildMasterCandidate
-    );
+    )
+	.sort((a, b) => {
+
+	  const dateDiff =
+		new Date(a.startDate) -
+		new Date(b.startDate);
+
+	  if (dateDiff !== 0) {
+		return dateDiff;
+	  }
+
+	  return a.tournamentId.localeCompare(
+		b.tournamentId
+	  );
+
+	});
 
 }
 
@@ -1341,11 +1359,14 @@ function buildTIJDisciplines(
     )
     .forEach(c => {
 
-      if (!grouped[c.tournamentId]) {
-        grouped[c.tournamentId] = [];
+      const key =
+        `${c.tournamentId}|${c.source}`;
+
+      if (!grouped[key]) {
+        grouped[key] = [];
       }
 
-      grouped[c.tournamentId].push(c);
+      grouped[key].push(c);
 
     });
 
@@ -1354,7 +1375,8 @@ function buildTIJDisciplines(
 
       group.sort(
         (a, b) =>
-          a.startDate - b.startDate
+          new Date(a.startDate) -
+          new Date(b.startDate)
       );
 
       if (group[0]) {
@@ -1453,8 +1475,6 @@ function compareMasterCandidate(
 
   const differences = [];
   
-  Logger.log(candidate);
-  Logger.log(master);
   if (
     candidate.title !== master.title
   ) {

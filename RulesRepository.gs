@@ -77,3 +77,32 @@ function loadCityReferences() {
   return references;
 
 }
+
+function getCityAliases() {
+
+  const aliases = {};
+
+  getRulesByType(
+    RULE_TYPES.CITY_ALIAS
+  )
+  .forEach(rule => {
+
+    aliases[rule.key] =
+      rule.value1;
+
+  });
+
+  return aliases;
+
+}
+
+function resolveCityAlias(
+  city
+) {
+
+  const aliases =
+    getCityAliases();
+
+  return aliases[city] || city;
+
+}

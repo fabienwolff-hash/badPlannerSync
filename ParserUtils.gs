@@ -78,19 +78,42 @@ function extractCategoriesFromAgeRange(
   value
 ) {
 
-if (value.includes('/')) {
+  //
+  // Minibad / Poussin / Benjamin
+  //
+  if (value.includes('/')) {
 
-  return value
-    .split('/')
-    .map(v => v.trim())
-    .map(v => CATEGORY_LABEL_MAPPING[v])
-    .filter(Boolean);
+    return value
+      .split('/')
+      .map(v => v.trim())
+      .map(
+        v => CATEGORY_LABEL_MAPPING[v]
+      )
+      .filter(Boolean);
 
-}	
+  }
 
+  //
+  // Minibads, Poussins, Benjamins
+  //
+  if (value.includes(',')) {
+
+    return value
+      .split(',')
+      .map(v => v.trim())
+      .map(
+        v => CATEGORY_LABEL_MAPPING[v]
+      )
+      .filter(Boolean);
+
+  }
+
+  //
+  // Ben à Cad
+  //
   const match =
     value.match(
-      /(MBad|Minibad|Pou|Poussin|Ben|Benjamin|Min|Minime|Cad|Cadet|Jun|Junior)\s+à\s+(MBad|Minibad|Pou|Poussin|Ben|Benjamin|Min|Minime|Cad|Cadet|Jun|Junior)/i
+      /(MBad|Minibad|Minibads|Pou|Poussin|Poussins|Ben|Benjamin|Benjamins|Min|Minime|Minimes|Cad|Cadet|Cadets|Jun|Junior|Juniors)\s+à\s+(MBad|Minibad|Minibads|Pou|Poussin|Poussins|Ben|Benjamin|Benjamins|Min|Minime|Minimes|Cad|Cadet|Cadets|Jun|Junior|Juniors)/i
     );
 
   if (!match) {
@@ -108,15 +131,20 @@ if (value.includes('/')) {
     ];
 
   const startIndex =
-    CATEGORY_ORDER.indexOf(start);
+    CATEGORY_ORDER.indexOf(
+      start
+    );
 
   const endIndex =
-    CATEGORY_ORDER.indexOf(end);
+    CATEGORY_ORDER.indexOf(
+      end
+    );
 
   return CATEGORY_ORDER.slice(
     startIndex,
     endIndex + 1
   );
+
 }
 
 function extractCategoriesFromMergedColumns(

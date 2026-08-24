@@ -145,7 +145,8 @@ function buildCityBasedTournamentId(
     .toUpperCase()
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^A-Z0-9]/g, '-');
+    .replace(/[^A-Z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
 
   return `${prefix}-${month}-${city}`;
 }
@@ -153,10 +154,41 @@ function buildCityBasedTournamentId(
 function buildCdjTournamentId(
   competition
 ) {
+
+  const month =
+    getMonthFromDate(
+      competition.startDate
+    );
+
+  //
+  // Format Comité
+  // CDJ n°1 Simple (BCPF)
+  //
+  let match =
+    competition.label.match(
+      /CDJ\s+n°(\d+)\s+(Simple|Double)/i
+    );
+
+  if (match) {
+
+    const discipline =
+      match[2].toUpperCase() === 'SIMPLE'
+        ? 'S'
+        : 'D';
+
+    return `CDJ-${month}-${discipline}${Number(match[1])}`;
+
+  }
+
+  //
+  // Format Ligue
+  // CDJ 35 - Antrain - S SI - N3 à NC
+  //
   return buildCityBasedTournamentId(
     'CDJ',
     competition
   );
+
 }
 
 function buildTdjTournamentId(

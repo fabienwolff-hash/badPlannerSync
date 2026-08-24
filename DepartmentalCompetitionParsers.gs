@@ -67,20 +67,64 @@ function parseCommitteeCDJLabel(
   label
 ) {
 
-  const match =
-    label.match(
-      /^CDJ\s+n°(\d+)\s+(.+?)\s+\((.+)\)$/i
-    );
+  let match;
 
-  if (!match) {
-    return rejectCompetition(SOURCES.COMITE_35,label);
+  //
+  // CDJ n°1 Simple (BCPF)
+  //
+  match = label.match(
+    /^CDJ\s+n°(\d+)\s+(Simple|Double)\s+\((.+)\)$/i
+  );
+
+  if (match) {
+
+    return {
+      number: Number(match[1]),
+      discipline: match[2].trim(),
+      location: match[3].trim()
+    };
+
   }
 
-  return {
-    number: Number(match[1]),
-    discipline: match[2].trim(),
-    location: match[3].trim()
-  };
+  //
+  // CDJ n°4 Simple Goven
+  //
+  match = label.match(
+    /^CDJ\s+n°(\d+)\s+(Simple|Double)\s+(.+)$/i
+  );
+
+  if (match) {
+
+    return {
+      number: Number(match[1]),
+      discipline: match[2].trim(),
+      location: match[3].trim()
+    };
+
+  }
+
+  //
+  // CDJ n°2 Double
+  //
+  match = label.match(
+    /^CDJ\s+n°(\d+)\s+(Simple|Double)$/i
+  );
+
+  if (match) {
+
+    return {
+      number: Number(match[1]),
+      discipline: match[2].trim(),
+      location: null
+    };
+
+  }
+
+  return rejectCompetition(
+    SOURCES.COMITE_35,
+    label
+  );
+
 }
 
 function parseTDJLabel(label) {

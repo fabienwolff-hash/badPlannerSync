@@ -328,22 +328,6 @@ function addSection(
 
 }
 
-function addSubSection(
-  sheet,
-  row,
-  title
-) {
-
-  sheet
-    .getRange(row, 1)
-    .setValue(title)
-    .setFontWeight('bold')
-    .setBackground('#D9EAD3');
-
-  return row + 1;
-
-}
-
 function buildSheetLink(
   sheetName,
   label

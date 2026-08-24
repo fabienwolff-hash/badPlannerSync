@@ -20,7 +20,7 @@ const COMMITTEE35_CALENDAR_CONFIG = {
       "COMMITTEE35_SPREADSHEET_ID"
     ),
 
-  SHEET_NAME: "CALENDRIER SPORTIF 2025-2026"
+  SHEET_NAME: "CALENDRIER SPORTIF 2026-2027"
 };
 
 const BADPLANNER_CONFIG = {
@@ -233,16 +233,22 @@ const CATEGORY_ORDER = [
 const CATEGORY_LABEL_MAPPING = {
   MBad: 'Minibad',
   Minibad: 'Minibad',
+  Minibads: 'Minibad',
   Pou: 'Poussin',
   Poussin: 'Poussin',
+  Poussins: 'Poussin',
   Ben: 'Benjamin',
   Benjamin: 'Benjamin',
+  Benjamins: 'Benjamin',
   Min: 'Minime',
   Minime: 'Minime',
+  Minimes: 'Minime',
   Cad: 'Cadet',
   Cadet: 'Cadet',
+  Cadets: 'Cadet',
   Jun: 'Junior',
-  Junior: 'Junior'
+  Junior: 'Junior',
+  Juniors: 'Junior',
 };
 
 const MATCH_STATUS = {
@@ -280,16 +286,10 @@ const MASTER_TOURNAMENT_HEADERS = [
 
 const RULE_TYPES = {
 
-  NORMALIZATION:
-    'NORMALIZATION',
-
-  MATCH_OVERRIDE:
-    'MATCH_OVERRIDE',
-
-  REJECTION_OVERRIDE:
-    'REJECTION_OVERRIDE',
-	
-  CITY_REFERENCE:
-    'CITY_REFERENCE'   
+  NORMALIZATION: 'NORMALIZATION',
+  MATCH_OVERRIDE: 'MATCH_OVERRIDE',
+  REJECTION_OVERRIDE: 'REJECTION_OVERRIDE',
+  CITY_REFERENCE: 'CITY_REFERENCE',
+  CITY_ALIAS: 'CITY_ALIAS'
 
 };

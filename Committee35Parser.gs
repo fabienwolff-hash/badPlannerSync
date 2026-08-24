@@ -422,25 +422,38 @@ function parseCommitteeDepartmentalCompetitions(
 
 	const normalizedLabel = normalizeCommitteeCDJLabel(normalizeCompetitionLabel(cell));
 	  
-	const parsed = parseCommitteeCDJLabel(normalizedLabel);
+	//
+	// Finale Promobad connue mais incomplète
+	//
+	if (
+	  normalizedLabel ===
+	  'Finale Promobad'
+	) {
 
-	if (!parsed) {
-	  return rejectCompetition(SOURCES.COMITE_35,cell);
+	  Logger.log(
+		'Finale Promobad ignorée : ville inconnue'
+	  );
+
+	  return;
 	}
 
-    //
-    // On ignore tout ce qui n'est pas
-    // CDJ / ICJ / Finale Promobad
-    //
-    if (
-      !normalizedLabel.startsWith('CDJ') &&
-      !normalizedLabel.startsWith('ICJ') &&
-      !normalizedLabel.startsWith(
-        'Finale Promobad'
-      )
-    ) {
-      return;
-    }
+	//
+	// On ignore tout ce qui n'est pas
+	// CDJ / ICJ / Finale Promobad
+	//
+	if (
+	  !normalizedLabel.startsWith('CDJ') &&
+	  !normalizedLabel.startsWith('ICJ') &&
+	  !normalizedLabel.startsWith(
+		'Finale Promobad'
+	  )
+	) {
+	  return rejectCompetition(
+		SOURCES.COMITE_35,
+		cell
+	  );
+	}
+
 
     const mergedInfo =
       getMergedInfo(
@@ -468,6 +481,12 @@ function parseCommitteeDepartmentalCompetitions(
       normalizedLabel.startsWith('CDJ')
     ) {
 
+      	const parsed = parseCommitteeCDJLabel(normalizedLabel);
+
+		if (!parsed) {
+		  return rejectCompetition(SOURCES.COMITE_35,cell);
+		}
+	
       competitions.push(
         createCompetition({
           source: SOURCES.COMITE_35,
@@ -534,7 +553,6 @@ function parseCommitteeDepartmentalCompetitions(
           type: COMPETITION_TYPES.PROMOBAD,
 
           department: '35',
-		  city: parsed.location,
 
           label: normalizedLabel,
 
@@ -631,6 +649,11 @@ function parseCommitteePromobadCompetitions(
           extractCategoriesFromAgeRange(
             categoriesLabel
           ),
+		  
+		disciplines:
+			buildCommitteePromobadDisciplines(
+			  discipline
+			),
 
         label:
           `${location} - ${discipline}`,
@@ -730,6 +753,7 @@ function parseCommitteeTdjCompetitions(
 
               categories:
                 parsed.categories,
+			  disciplines: buildCommitteeTdjDisciplines(discipline), 
 
               label:
                 `${city} - ${parsed.discipline}`,
@@ -762,7 +786,7 @@ function parseCommitteeTdjCompetitions(
           extractCategoriesFromAgeRange(
             categoriesLabel
           ),
-
+		disciplines: buildCommitteeTdjDisciplines(discipline), 
         label:
           `${city} - ${discipline}`,
 
@@ -777,4 +801,62 @@ function parseCommitteeTdjCompetitions(
   });
 
   return competitions;
+}
+
+function buildCommitteeTdjDisciplines(
+  discipline
+) {
+
+  const value =
+    discipline
+      .trim()
+      .toUpperCase();
+
+  switch (value) {
+
+    case 'S':
+    case 'SI':
+    case 'SIMPLE':
+    case 'SH':
+    case 'SH / SD':
+      return ['Simple'];
+
+    case 'D':
+    case 'DH':
+    case 'DD':
+      return ['Double'];
+
+    default:
+      return [];
+
+  }
+
+}
+
+function buildCommitteePromobadDisciplines(
+  discipline
+) {
+
+  const value =
+    discipline
+      .trim()
+      .toUpperCase();
+
+  switch (value) {
+
+    case 'SI':
+    case 'S':
+    case 'SIMPLE':
+      return ['Simple'];
+
+    case 'DI':
+    case 'D':
+    case 'DOUBLE':
+      return ['Double'];
+
+    default:
+      return [];
+
+  }
+
 }
