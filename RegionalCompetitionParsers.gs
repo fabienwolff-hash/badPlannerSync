@@ -190,6 +190,29 @@ function parseTIJ(
   mergedInfo
 ) {
 
+  const lines = extractLines(cell);
+  if (!lines.length) {
+	return [];
+	}
+  const titleLine = lines[0];
+  
+    const locationLine =
+    lines.length > 1
+      ? lines[1]
+      : null;
+
+  const region =
+    extractRegionFromTIJLabel(
+      titleLine
+    );
+
+  const locationInfo =
+    locationLine
+      ? extractCityAndDepartment(
+          locationLine
+        )
+      : null;
+
   const {
     startDate,
     endDate
@@ -201,30 +224,30 @@ function parseTIJ(
     currentMonth
   );
   
-  const region =
-  extractRegionFromTIJLabel(
-    cell.trim()
-  );
 
   return [
 
     createCompetition({
       source,
       type: COMPETITION_TYPES.TIJ,
-      label: cell.trim(),
+      label: titleLine,
       startDate,
       endDate: startDate,
 	  region,
+	  city: locationInfo?.city,
+	  department: locationInfo?.department,
       rawData: cell
     }),
 
     createCompetition({
       source,
       type: COMPETITION_TYPES.TIJ,
-      label: cell.trim(),
+      label: titleLine,
       startDate: addDays(startDate, 1),
       endDate: addDays(startDate, 1),
 	  region,
+	  city: locationInfo?.city,
+	  department: locationInfo?.department,
       rawData: cell
     })
 

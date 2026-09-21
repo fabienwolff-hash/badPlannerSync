@@ -1294,28 +1294,34 @@ function buildMasterCandidates(
   competitions
 ) {
 
+  const today = new Date();
+
+  today.setHours(0, 0, 0, 0);
+
   return competitions
+    .filter(isMasterCompetition)
     .filter(
-      isMasterCompetition
+      competition =>
+        new Date(
+          competition.endDate
+        ) >= today
     )
-    .map(
-      buildMasterCandidate
-    )
-	.sort((a, b) => {
+    .map(buildMasterCandidate)
+    .sort((a, b) => {
 
-	  const dateDiff =
-		new Date(a.startDate) -
-		new Date(b.startDate);
+      const dateDiff =
+        new Date(a.startDate) -
+        new Date(b.startDate);
 
-	  if (dateDiff !== 0) {
-		return dateDiff;
-	  }
+      if (dateDiff !== 0) {
+        return dateDiff;
+      }
 
-	  return a.tournamentId.localeCompare(
-		b.tournamentId
-	  );
+      return a.tournamentId.localeCompare(
+        b.tournamentId
+      );
 
-	});
+    });
 
 }
 
@@ -1434,37 +1440,118 @@ function analyzeMasterCandidates(
 
       }
 
-      const matchingTournament =
-        matches.find(
-          tournament =>
-            sameDate(
-              tournament.startDate,
-              candidate.startDate
-            )
-            &&
-            tournament.categories ===
-              candidate.categories
-        );
+      const matchingTournaments =
+		  matches.filter(
+			tournament =>
+			  sameDate(
+				tournament.startDate,
+				candidate.startDate
+			  )
+		  );
 
-      if (!matchingTournament) {
+		if (matchingTournaments.length === 0) {
 
-        candidate.masterAction =
-          'CREATE';
+		  candidate.masterAction =
+			'CREATE';
 
-        candidate.masterReason =
-          'No matching occurrence';
+		  candidate.masterReason =
+			'No matching occurrence';
 
-        return;
+		  return;
+		}
+		
+		let matchingTournament =
+		  matchingTournaments.find(
+			tournament =>
+			  normalizeMatchValue(
+				resolveCityAlias(
+				  tournament.city || ''
+				)
+			  ) ===
+			  normalizeMatchValue(
+				resolveCityAlias(
+				  candidate.city || ''
+				)
+			  )
+		  );
+		  
+		  if (!matchingTournament) {
+			  matchingTournament =
+				mergeMasterOccurrences(
+				  matchingTournaments
+				);
 
-      }
-
-      compareMasterCandidate(
-        candidate,
-        matchingTournament
-      );
-
+			}
+			
+			compareMasterCandidate(
+			  candidate,
+			  matchingTournament
+			);
     }
   );
+
+}
+
+function mergeMasterOccurrences(
+  tournaments
+) {
+
+  const mergedCategories =
+    [
+      ...new Set(
+        tournaments.flatMap(
+          tournament =>
+            String(
+              tournament.categories || ''
+            )
+              .split(';')
+              .map(c => c.trim())
+              .filter(Boolean)
+        )
+      )
+    ];
+
+  const mergedDisciplines =
+    [
+      ...new Set(
+        tournaments.flatMap(
+          tournament =>
+            String(
+              tournament.disciplines || ''
+            )
+              .split(';')
+              .map(d => d.trim())
+              .filter(Boolean)
+        )
+      )
+    ];
+
+  const mergedCities =
+    [
+      ...new Set(
+        tournaments
+          .map(
+            tournament =>
+              String(
+                tournament.city || ''
+              ).trim()
+          )
+          .filter(Boolean)
+      )
+    ];
+
+  return {
+    ...tournaments[0],
+
+    categories:
+      mergedCategories.join(';'),
+
+    disciplines:
+      mergedDisciplines.join(';'),
+
+    city:
+      mergedCities.join(';')
+  };
 
 }
 

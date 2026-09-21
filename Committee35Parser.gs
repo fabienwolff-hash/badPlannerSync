@@ -818,6 +818,7 @@ function buildCommitteeTdjDisciplines(
     case 'SI':
     case 'SIMPLE':
     case 'SH':
+	case 'SH/SD':
     case 'SH / SD':
       return ['Simple'];
 

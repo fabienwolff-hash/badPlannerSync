@@ -43,6 +43,7 @@ function parseBNP(
 ) {
 
 const lines = extractLines(cell);
+const city = extractCity(lines);
 
 const {
   startDate,
@@ -61,6 +62,7 @@ return createCompetition({
   label: lines.join(' '),
   startDate,
   endDate,
+  city,
   rawData: cell
 });
 }

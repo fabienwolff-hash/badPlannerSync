@@ -43,10 +43,21 @@ function extractCityAndDepartment(value) {
 }
 
 function extractCity(lines) {
-  return lines[1]
-    .replace('(', '')
-    .replace(')', '')
+
+  const cityLine =
+    lines.find(line =>
+      line.startsWith('(') &&
+      line.endsWith(')')
+    );
+
+  if (!cityLine) {
+    return null;
+  }
+
+  return cityLine
+    .replace(/[()]/g, '')
     .trim();
+
 }
 
 function extractDepartmentFromTRJLabel(label) {

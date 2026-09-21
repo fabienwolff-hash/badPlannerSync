@@ -121,7 +121,17 @@ function buildInterclubTournamentId(
     competition.startDate
   );
 
-  return `IC-${month}-REGIONAL`;
+  switch (competition.scope) {
+
+    case SCOPES.DEPARTEMENTALE:
+      return `IC-${month}-DEPARTEMENTAL`;
+
+    case SCOPES.REGIONALE:
+      return `IC-${month}-REGIONAL`;
+
+    default:
+      return `IC-${month}`;
+  }
 }
 
 function buildPromobadTournamentId(
