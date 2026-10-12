@@ -263,6 +263,14 @@ function parseChampionnatBretagneJeunes(
   mergedInfo
 ) {
 
+  const lines =
+    extractLines(cell);
+
+  const locationInfo =
+    extractCityAndDepartment(
+      lines[lines.length - 1]
+    );
+
   const {
     startDate,
     endDate
@@ -278,13 +286,19 @@ function parseChampionnatBretagneJeunes(
     source: SOURCES.LIGUE_BRETAGNE,
     type: COMPETITION_TYPES.CHAMPIONNAT,
     scope: SCOPES.REGIONALE,
-    label: "Championnat Régional",
+
+    label: 'Championnat Régional',
 
     startDate,
     endDate,
 
+    city: locationInfo?.city,
+    department:
+      locationInfo?.department,
+
     rawData: cell
   });
+
 }
 
 function parseFinaleRegionaleInterclubsJeunes(

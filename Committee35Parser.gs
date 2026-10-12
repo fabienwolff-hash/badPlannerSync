@@ -810,28 +810,38 @@ function buildCommitteeTdjDisciplines(
   const value =
     discipline
       .trim()
-      .toUpperCase();
+      .toUpperCase()
+      .replace(/\s+/g, '');
 
-  switch (value) {
+  const disciplines = [];
 
-    case 'S':
-    case 'SI':
-    case 'SIMPLE':
-    case 'SH':
-	case 'SH/SD':
-    case 'SH / SD':
-      return ['Simple'];
-
-    case 'D':
-    case 'DH':
-    case 'DD':
-      return ['Double'];
-
-    default:
-      return [];
-
+  if (
+    value.includes('SH') ||
+    value.includes('SD') ||
+    value === 'S' ||
+    value === 'SI' ||
+    value.includes('SIMPLE')
+  ) {
+    disciplines.push('Simple');
   }
 
+  if (
+    value.includes('DH') ||
+    value.includes('DD') ||
+    value === 'D' ||
+    value.includes('DOUBLE')
+  ) {
+    disciplines.push('Double');
+  }
+
+  if (
+    value.includes('MX') ||
+    value.includes('MIXTE')
+  ) {
+    disciplines.push('Mixte');
+  }
+
+  return disciplines;
 }
 
 function buildCommitteePromobadDisciplines(
